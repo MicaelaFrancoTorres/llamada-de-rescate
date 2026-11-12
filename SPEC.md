@@ -5,7 +5,8 @@
 ## Teoría de la cursada aplicada
 | Clase | Dónde se aplica |
 |---|---|
-| 3 · HTML semántico y WCAG | `main`, `section`, `header`, `article`, `fieldset`/`legend`, `label`, `aria-label`, `aria-live`, `role="alert"`, foco visible, 44 px mínimos |
+| 3 · HTML semántico y WCAG | `main`, `section`, `header`, `article`, `footer`, `figure`, `ul`/`ol`/`li`, `fieldset`/`legend`, `label`, `aria-label`, `aria-live`, `aria-hidden` en emojis decorativos, `role="alert"`, `role="timer"`, foco visible, 44 px mínimos; sin `div` en el HTML |
+| 5 · JavaScript base (buenas prácticas) | `const` para todo lo que no se reasigna, `let` solo si se reasigna y nunca `var`; nombres de variables, parámetros y funciones en español; `===` siempre |
 | 4 · CSS moderno | `box-sizing: border-box`, variables CSS, Grid para la grilla de opciones, Flexbox para la pantalla de llamada, media query |
 | 5 · JavaScript base | `const`/`let` (sin `var`), `===`, arrow functions, template literals, `??` |
 | 6 · DOM | `querySelector`, `addEventListener`, patrón **estado → render()** |
@@ -53,6 +54,8 @@
 - **R9:** el nombre de contacto es opcional ("¿Quién querés que te llame?"). `limpiarNombre` le quita los espacios de los extremos y lo corta en 20 caracteres. Si queda un nombre, reemplaza al llamador del lugar (R2); si queda vacío, vale el llamador de siempre. No cambia el diálogo.
 - **R10:** cada lugar tiene una voz propia `voz: {tono, velocidad}`, que se usa en los turnos de quien llama: Mamá 1,2 / 1; Vecina Marta 1,3 / 0,9; Mejor amiga 1,4 / 1,1; Soporte Técnico 0,7 / 1; Hermano/a 1,1 / 1,15; Abuela 1,3 / 0,8; Cerrajero 0,6 / 0,95; Trabajo 0,8 / 1,05. La voz es del personaje: si se personaliza el nombre (R9), sigue siendo la del lugar. Se prefiere una voz en español (primero es-AR); si el navegador no tiene ninguna, se usa la voz por defecto con `lang` "es-AR". La lectura arranca directo en el clic de Atender, con `speechSynthesis.cancel()` antes y sin esperar `voiceschanged`.
 - **R11:** los turnos de "vos" se leen SIEMPRE con una voz distinta a la de quien llama: otra voz en español si hay más de una (tono 1, velocidad 1); si hay una sola, la misma voz con tono 0,9 y velocidad 1,05. `elegirVoces(voces)` es una función pura. Se lee la conversación completa (llama, vos, llama, vos, llama) con 0,5 s entre turnos. Como las respuestas ya se leen siempre, se elimina el interruptor "Modo práctica".
+- **R12:** las excusas y los diálogos usan español rioplatense (voseo y expresiones como "escuchame", "dale", "nena" y "che"), sin malas palabras. La respuesta de "vos" contesta exactamente lo que dijo quien llama en el turno anterior (si pregunta cuánto tardás, respondés un tiempo).
+- **R13:** la interfaz usa HTML semántico antes que `div`: listas (`ul`/`ol`) para opciones y chat, `figure` para el avatar, `footer` para los botones de llamada y `p` para el mensaje final. ARIA solo donde HTML no alcanza: `aria-live` en lo que cambia (aviso con `role="alert"`, chat y estado de la llamada), `role="timer"` en el reloj para que no se anuncie cada segundo, `aria-label` en los botones que solo tienen emoji y `aria-hidden` en los emojis decorativos.
 - **R3:** credibilidad = base del nivel (94 / 78 / 52) − ganas. Tiempo de escape: 120 / 45 / 12 segundos.
 - **R4:** sin lugar elegido, o con ganas fuera de 1–10, no hay rescate (`null`) y se muestra un aviso.
 - **R5:** cada lugar y nivel tiene un `dialogo` de 5 turnos `{quien, texto}`: empieza con "llama", alterna con "vos" y es coherente con la excusa (`decir` es el primer turno de "vos"). Al atender, los turnos se revelan como chat (burbujas: izquierda quien llama, derecha vos). Todos los turnos se leen con `speechSynthesis` (voces en R10 y R11) y los de "vos" se resaltan "💬 Decí: ...". Sin soporte de voz, los de "llama" esperan 2,5 s y los de "vos" 3 s. Al terminar aparecen los pasos de escape y el botón Cortar. Cortar o rechazar frena la voz.
@@ -87,6 +90,8 @@
 - **E13 (R9):** *Given* escribí "  Tía Rosa  " en el nombre y elegí "Cumpleaños", *When* toco RESCATAME, *Then* suena una llamada de "Tía Rosa" en vez de "Mamá". *Given* dejé el campo vacío, *Then* llama "Mamá".
 - **E14 (CI):** *Given* hago push o abro un pull request a `main`, *When* termina el workflow "CI", *Then* `npm test` corrió con Node 22 y la pestaña Actions muestra el resultado (verde si pasan todos los tests).
 - **E15 (R10):** *Given* elijo "Asado eterno" y después "Reunión de consorcio", *When* atiendo cada llamada, *Then* la Abuela suena aguda y lenta (tono 1,3 / velocidad 0,8) y el Cerrajero grave (tono 0,6 / velocidad 0,95). Con el nombre "Tía Rosa" la voz sigue siendo la del lugar.
+- **E16 (R12):** *Given* llama la "Mamá" y pregunta "¿Cuánto tardás en llegar?", *When* llega mi turno, *Then* mi frase responde con un tiempo ("Veinte minutos, ma..."), y el diálogo suena rioplatense ("escuchame", "dale", "che").
+- **E17 (R13):** *Given* uso el teclado y un lector de pantalla, *When* recorro la app con Tab, *Then* cada control tiene foco visible, los botones con solo emoji se anuncian por su `aria-label`, cada turno nuevo del chat se anuncia sin releer los anteriores, y el reloj de la llamada no se anuncia cada segundo.
 
 ## 8. Casos borde
 - Ganas en los límites: 1, 3, 4, 7, 8 y 10 (cubiertos por los tests).
@@ -103,6 +108,7 @@
 - Rechazar o cortar mientras habla la voz: se cancela la lectura y no se revela ningún turno más.
 
 ## 9. Accesibilidad
+- Estructura semántica (R13): las opciones son listas, el avatar es un `figure`, los botones de la llamada están en un `footer` y no quedan `div` en el HTML.
 - Etiquetas `label`, `fieldset` y `legend` en el formulario. Todo se puede usar con teclado (Tab, flechas y Enter).
 - Foco visible, botones de 44 px como mínimo y `aria-label` en los botones que solo tienen emoji.
 - El chat vive dentro de la región `aria-live="polite"`, así que un lector de pantalla anuncia cada turno nuevo.
@@ -127,6 +133,7 @@
 | T11: Nombre de contacto personalizado | R9 | E13 | `limpiarNombre` y `armarRescate` con tests en `rescate.js`, input en `index.html` |
 | T12: Integración continua | R1–R9 | E14 | `.github/workflows/ci.yml` y la pestaña Actions de GitHub |
 | T13: Voces por personaje y para las respuestas | R10, R11 | E7, E8, E15 | `voz` en `LUGARES` y `elegirVoces` con tests en `rescate.js`, `leer()` en `app.js` |
+| T14: Semántica, accesibilidad y excusas realistas | R12, R13 | E16, E17 | `index.html`, `style.css`, `dialogos` en `rescate.js` con tests R12, y `app.js` |
 
 ## 12. Preguntas abiertas
 Ninguna crítica.

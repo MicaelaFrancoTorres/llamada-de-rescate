@@ -11,70 +11,71 @@
     <!-- PANTALLA 1: ENTRADA -->
     <section id="inicio" aria-labelledby="titulo">
       <header>
-        <h1 id="titulo">🚨 Llamada de Rescate</h1>
+        <h1 id="titulo"><span aria-hidden="true">🚨</span> Llamada de Rescate</h1>
         <p class="sub">¿Atrapado/a en un lugar del que no te podés ir sin quedar mal?</p>
       </header>
 
       <fieldset>
         <legend>1. ¿Dónde estás?</legend>
-        <div class="opciones">
-          <label class="op"><input type="radio" name="lugar" value="cumple"> 🎂 Cumpleaños</label>
-          <label class="op"><input type="radio" name="lugar" value="familia"> 👵 Reunión familiar</label>
-          <label class="op"><input type="radio" name="lugar" value="cita"> 💔 Cita</label>
-          <label class="op"><input type="radio" name="lugar" value="trabajo"> 💼 Trabajo</label>
-          <label class="op"><input type="radio" name="lugar" value="clase"> 📚 Clase aburrida</label>
-          <label class="op"><input type="radio" name="lugar" value="asado"> 🍖 Asado eterno</label>
-          <label class="op"><input type="radio" name="lugar" value="consorcio"> 🏢 Reunión de consorcio</label>
-          <label class="op"><input type="radio" name="lugar" value="sala"> 🩺 Sala de espera</label>
-        </div>
+        <ul class="opciones">
+          <li><label class="op"><input type="radio" name="lugar" value="cumple"> <span aria-hidden="true">🎂</span> Cumpleaños</label></li>
+          <li><label class="op"><input type="radio" name="lugar" value="familia"> <span aria-hidden="true">👵</span> Reunión familiar</label></li>
+          <li><label class="op"><input type="radio" name="lugar" value="cita"> <span aria-hidden="true">💔</span> Cita</label></li>
+          <li><label class="op"><input type="radio" name="lugar" value="trabajo"> <span aria-hidden="true">💼</span> Trabajo</label></li>
+          <li><label class="op"><input type="radio" name="lugar" value="clase"> <span aria-hidden="true">📚</span> Clase aburrida</label></li>
+          <li><label class="op"><input type="radio" name="lugar" value="asado"> <span aria-hidden="true">🍖</span> Asado eterno</label></li>
+          <li><label class="op"><input type="radio" name="lugar" value="consorcio"> <span aria-hidden="true">🏢</span> Reunión de consorcio</label></li>
+          <li><label class="op"><input type="radio" name="lugar" value="sala"> <span aria-hidden="true">🩺</span> Sala de espera</label></li>
+        </ul>
       </fieldset>
 
       <label for="ganas" class="pregunta">2. ¿Cuántas ganas tenés de irte?</label>
       <input type="range" id="ganas" min="1" max="10" value="5">
-      <p id="ganasTxt"></p>
+      <p id="ganasTxt"><span id="ganasNumero"></span> <span id="ganasCara" aria-hidden="true"></span></p>
 
       <fieldset>
         <legend>3. ¿Cuándo querés que suene?</legend>
-        <div class="opciones tres">
-          <label class="op"><input type="radio" name="demora" value="0" checked> Ya</label>
-          <label class="op"><input type="radio" name="demora" value="5"> 5 s</label>
-          <label class="op"><input type="radio" name="demora" value="10"> 10 s</label>
-        </div>
+        <ul class="opciones tres">
+          <li><label class="op"><input type="radio" name="demora" value="0" checked> Ya</label></li>
+          <li><label class="op"><input type="radio" name="demora" value="5"> 5 s</label></li>
+          <li><label class="op"><input type="radio" name="demora" value="10"> 10 s</label></li>
+        </ul>
       </fieldset>
 
       <label for="nombre" class="pregunta">¿Quién querés que te llame?</label>
       <input type="text" id="nombre" maxlength="20" placeholder="Opcional (ej.: Tía Rosa)" autocomplete="off">
+
       <button id="btnRescate" type="button">RESCATAME</button>
       <p id="aviso" role="alert"></p>
-      <p id="historial" class="sub"></p>
+      <p id="historial" class="sub"><span aria-hidden="true">🏃</span> Escapes exitosos: <span id="escapes">0</span> · <span aria-hidden="true">😶</span> Rechazados: <span id="rechazos">0</span></p>
       <p class="atajo">Atajo secreto: tecla R</p>
     </section>
 
     <!-- PANTALLA 2: LLAMADA FALSA -->
-    <section id="llamada" aria-live="polite" hidden>
-      <div id="avatar" aria-hidden="true"></div>
+    <section id="llamada" aria-label="Llamada" hidden>
+      <figure id="avatar" aria-hidden="true"></figure>
       <h2 id="quien"></h2>
-      <p id="estado"></p>
+      <p id="estado" aria-live="polite"></p>
+      <p id="reloj" role="timer" hidden></p>
 
       <article id="guion" hidden>
-        <h3>📜 Tu guion de escape</h3>
-        <div id="chat"></div>
-        <div id="escape" hidden>
+        <h3><span aria-hidden="true">📜</span> Tu guion de escape</h3>
+        <ol id="chat" aria-live="polite"></ol>
+        <section id="escape" hidden>
+          <h4>Tus pasos de escape</h4>
           <ol id="pasos"></ol>
           <p id="dato"></p>
-        </div>
+        </section>
       </article>
 
-      <div id="fin" hidden>
-        <p id="mensajeFin"></p>
-        <button id="btnVolver" type="button">← Volver</button>
-      </div>
+      <p id="mensajeFin" hidden><span id="emojiFin" aria-hidden="true"></span> <span id="textoFin"></span></p>
+      <button id="btnVolver" type="button" hidden>← Volver</button>
 
-      <div id="entrante" class="botones">
-        <button id="btnRechazar" class="circ rojo" type="button" aria-label="Rechazar llamada">📵</button>
-        <button id="btnAtender" class="circ verde" type="button" aria-label="Atender llamada">📞</button>
-      </div>
-      <button id="btnCortar" class="circ rojo" type="button" aria-label="Cortar y huir" hidden>📵</button>
+      <footer class="botones">
+        <button id="btnRechazar" class="circ rojo" type="button" aria-label="Rechazar llamada"><span aria-hidden="true">📵</span></button>
+        <button id="btnAtender" class="circ verde" type="button" aria-label="Atender llamada"><span aria-hidden="true">📞</span></button>
+        <button id="btnCortar" class="circ rojo" type="button" aria-label="Cortar y huir" hidden><span aria-hidden="true">📵</span></button>
+      </footer>
     </section>
   </main>
 

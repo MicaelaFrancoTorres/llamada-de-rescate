@@ -21,7 +21,8 @@ function registrar(resultado) {
 }
 
 const estado = {
-  pantalla: "inicio", lugar: null, ganas: 5, rescate: null, segundos: 0, aviso: "", mensajeFin: "",
+  pantalla: "inicio", lugar: null, ganas: 5, rescate: null, segundos: 0, aviso: "",
+  emojiFin: "", mensajeFin: "",
   turnos: 0,          // cuántos turnos del diálogo ya se revelaron
   terminado: false,   // la conversación llegó al último turno
   demora: 0,          // segundos antes de que suene (0 = ya)
@@ -39,15 +40,31 @@ const TRANSICIONES = {
   fin: ["inicio"],
 };
 
-const $ = (selector) => document.querySelector(selector);
+const TEXTOS_ESTADO = { sonando: "Llamada entrante...", "en-llamada": "En llamada", fin: "Llamada finalizada" };
 const CARAS = ["😐", "😐", "🙂", "😕", "😕", "😩", "😩", "😱", "😱", "🔥"];
 const hayVoz = "speechSynthesis" in window;
+
 let audio = null;
-let timbre = null;
-let reloj = null;
-let cuenta = null;
-let pausa = null;
-let sesion = 0; // cambia al cortar: ignora callbacks viejos de la voz
+let idTimbre = null;
+let idReloj = null;
+let idCuenta = null;
+let idPausa = null;
+let sesion = 0;          // cambia al cortar: ignora los avisos viejos de la voz
+let turnosDibujados = 0; // el chat solo agrega burbujas nuevas, así el lector de pantalla no relee todo
+
+const buscar = (selector) => document.querySelector(selector);
+
+// Solo escribe si el texto cambió, para no molestar a las regiones aria-live
+function escribir(selector, texto) {
+  const elemento = buscar(selector);
+  if (elemento.textContent !== texto) elemento.textContent = texto;
+}
+
+const formatearReloj = (segundos) =>
+  `${String(Math.floor(segundos / 60)).padStart(2, "0")}:${String(segundos % 60).padStart(2, "0")}`;
+
+const armarBurbuja = ({ quien, texto }) =>
+  `<li class="burbuja ${quien}">${quien === "vos" ? '<span aria-hidden="true">💬</span> Decí: ' : ""}${texto}</li>`;
 
 function irA(pantalla) {
   if (!TRANSICIONES[estado.pantalla].includes(pantalla)) return;
@@ -58,46 +75,58 @@ function irA(pantalla) {
 function render() {
   const { pantalla, rescate } = estado;
   const enInicio = pantalla === "inicio" || pantalla === "esperando";
-  $("#inicio").hidden = !enInicio;
-  $("#llamada").hidden = enInicio;
-  $("#btnRescate").disabled = pantalla === "esperando";
-  $("#ganasTxt").textContent = `${estado.ganas}/10 ${CARAS[estado.ganas - 1]}`;
-  $("#aviso").textContent = estado.aviso;
-  $("#historial").textContent = `🏃 Escapes exitosos: ${estado.historial.escapes} · 😶 Rechazados: ${estado.historial.rechazos}`;
+  buscar("#inicio").hidden = !enInicio;
+  buscar("#llamada").hidden = enInicio;
+  buscar("#btnRescate").disabled = pantalla === "esperando";
+  escribir("#ganasNumero", `${estado.ganas}/10`);
+  escribir("#ganasCara", CARAS[estado.ganas - 1]);
+  escribir("#aviso", estado.aviso);
+  escribir("#escapes", String(estado.historial.escapes));
+  escribir("#rechazos", String(estado.historial.rechazos));
 
   if (!rescate) return;
-  $("#avatar").textContent = rescate.avatar;
-  $("#quien").textContent = rescate.quien;
-  $("#llamada").classList.toggle("sonando", pantalla === "sonando");
-  $("#entrante").hidden = pantalla !== "sonando";
-  $("#guion").hidden = pantalla !== "en-llamada";
-  $("#escape").hidden = !estado.terminado;
-  $("#btnCortar").hidden = pantalla !== "en-llamada" || !estado.terminado;
-  $("#fin").hidden = pantalla !== "fin";
+  const sonando = pantalla === "sonando";
+  const enLlamada = pantalla === "en-llamada";
+  escribir("#avatar", rescate.avatar);
+  escribir("#quien", rescate.quien);
+  escribir("#estado", TEXTOS_ESTADO[pantalla] ?? "");
+  escribir("#reloj", formatearReloj(estado.segundos));
+  buscar("#llamada").classList.toggle("sonando", sonando);
+  buscar("#btnRechazar").hidden = !sonando;
+  buscar("#btnAtender").hidden = !sonando;
+  buscar("#reloj").hidden = !enLlamada;
+  buscar("#guion").hidden = !enLlamada;
+  buscar("#escape").hidden = !estado.terminado;
+  buscar("#btnCortar").hidden = !enLlamada || !estado.terminado;
+  buscar("#mensajeFin").hidden = pantalla !== "fin";
+  buscar("#btnVolver").hidden = pantalla !== "fin";
 
-  const textosEstado = { sonando: "Llamada entrante...", "en-llamada": `00:${String(estado.segundos).padStart(2, "0")}`, fin: "Llamada finalizada" };
-  $("#estado").textContent = textosEstado[pantalla] ?? "";
+  if (estado.turnos < turnosDibujados) {
+    buscar("#chat").innerHTML = "";
+    turnosDibujados = 0;
+  }
+  rescate.dialogo
+    .slice(turnosDibujados, estado.turnos)
+    .forEach((turno) => buscar("#chat").insertAdjacentHTML("beforeend", armarBurbuja(turno)));
+  turnosDibujados = estado.turnos;
 
-  $("#chat").innerHTML = rescate.dialogo
-    .slice(0, estado.turnos)
-    .map(({ quien, texto }) => `<p class="burbuja ${quien}">${quien === "vos" ? "💬 Decí: " : ""}${texto}</p>`)
-    .join("");
-  $("#pasos").innerHTML = rescate.pasos.map((paso) => `<li>${paso}</li>`).join("");
-  $("#dato").textContent = `Credibilidad: ${rescate.credibilidad}% · Escape en ${rescate.segundos} s`;
-  $("#mensajeFin").textContent = estado.mensajeFin;
+  buscar("#pasos").innerHTML = rescate.pasos.map((paso) => `<li>${paso}</li>`).join("");
+  escribir("#dato", `Credibilidad: ${rescate.credibilidad}% · Escape en ${rescate.segundos} s`);
+  escribir("#emojiFin", estado.emojiFin);
+  escribir("#textoFin", estado.mensajeFin);
 }
 
 // Sonido generado con el navegador, sin archivos de audio
 function sonarTimbre() {
-  const tono = () => {
+  const sonarTono = () => {
     const oscilador = audio.createOscillator();
     oscilador.frequency.value = 880;
     oscilador.connect(audio.destination);
     oscilador.start();
     oscilador.stop(audio.currentTime + 0.4);
   };
-  tono();
-  timbre = setInterval(tono, 1500);
+  sonarTono();
+  idTimbre = setInterval(sonarTono, 1500);
 }
 
 function empezarASonar() {
@@ -106,9 +135,9 @@ function empezarASonar() {
 }
 
 // ===== Conversación: un turno por vez, con voz o con espera =====
-function esperar(ms, accion) {
-  clearTimeout(pausa);
-  pausa = setTimeout(accion, ms);
+function esperar(milisegundos, accion) {
+  clearTimeout(idPausa);
+  idPausa = setTimeout(accion, milisegundos);
 }
 
 // Quien llama suena con la voz de su personaje; vos, siempre con una voz distinta
@@ -127,15 +156,15 @@ function leer(texto, { voz, tono, velocidad }, alTerminar) {
   lectura.rate = velocidad;
 
   let listo = false;
-  const fin = () => {
+  const terminar = () => {
     if (listo || miSesion !== sesion) return;
     listo = true;
     alTerminar();
   };
-  lectura.onend = fin;
-  lectura.onerror = fin;
+  lectura.onend = terminar;
+  lectura.onerror = terminar;
   speechSynthesis.speak(lectura);
-  esperar(15000, fin); // red de seguridad si el navegador nunca avisa que terminó
+  esperar(15000, terminar); // red de seguridad si el navegador nunca avisa que terminó
 }
 
 function siguienteTurno() {
@@ -154,12 +183,48 @@ function siguienteTurno() {
 }
 
 function cortarTodo() {
-  clearInterval(timbre);
-  clearInterval(reloj);
-  clearInterval(cuenta);
-  clearTimeout(pausa);
+  clearInterval(idTimbre);
+  clearInterval(idReloj);
+  clearInterval(idCuenta);
+  clearTimeout(idPausa);
   sesion++;
   if (hayVoz) speechSynthesis.cancel();
+}
+
+function terminarLlamada(resultado, emoji, mensaje) {
+  cortarTodo();
+  registrar(resultado);
+  estado.emojiFin = emoji;
+  estado.mensajeFin = mensaje;
+  irA("fin");
+}
+
+// ===== Rescate =====
+function rescatar() {
+  const rescate = armarRescate(estado.lugar, estado.ganas, estado.nombre);
+  if (!rescate) {
+    estado.aviso = "⚠️ Primero elegí dónde estás";
+    return render();
+  }
+  estado.rescate = rescate;
+  estado.segundos = 0;
+  audio ??= new AudioContext();
+  audio.resume(); // el navegador pide un gesto del usuario: se habilita ahora y suena después
+  if (estado.demora === 0) return empezarASonar();
+
+  estado.espera = estado.demora;
+  estado.aviso = `⏳ Sonando en ${estado.espera} s...`;
+  irA("esperando");
+  idCuenta = setInterval(() => {
+    estado.espera--;
+    if (estado.espera > 0) {
+      estado.aviso = `⏳ Sonando en ${estado.espera} s...`;
+      return render();
+    }
+    clearInterval(idCuenta);
+    estado.aviso = "";
+    empezarASonar();
+  }, 1000);
 }
 
 // ===== Eventos =====
@@ -177,62 +242,35 @@ document.querySelectorAll("input[name=demora]").forEach((radio) => {
   });
 });
 
-$("#ganas").addEventListener("input", (e) => {
-  estado.ganas = Number(e.target.value);
+buscar("#ganas").addEventListener("input", (evento) => {
+  estado.ganas = Number(evento.target.value);
   render();
 });
 
-$("#nombre").addEventListener("input", (e) => {
-  estado.nombre = e.target.value;
+buscar("#nombre").addEventListener("input", (evento) => {
+  estado.nombre = evento.target.value;
 });
 
-function rescatar() {
-  const rescate = armarRescate(estado.lugar, estado.ganas, estado.nombre);
-  if (!rescate) {
-    estado.aviso = "⚠️ Primero elegí dónde estás";
-    return render();
-  }
-  estado.rescate = rescate;
-  estado.segundos = 0;
-  audio ??= new AudioContext();
-  audio.resume(); // el navegador pide un gesto del usuario: se habilita ahora y suena después
-  if (estado.demora === 0) return empezarASonar();
-
-  estado.espera = estado.demora;
-  estado.aviso = `⏳ Sonando en ${estado.espera} s...`;
-  irA("esperando");
-  cuenta = setInterval(() => {
-    estado.espera--;
-    if (estado.espera > 0) {
-      estado.aviso = `⏳ Sonando en ${estado.espera} s...`;
-      return render();
-    }
-    clearInterval(cuenta);
-    estado.aviso = "";
-    empezarASonar();
-  }, 1000);
-}
-
-$("#btnRescate").addEventListener("click", rescatar);
+buscar("#btnRescate").addEventListener("click", rescatar);
 
 // Atajo secreto: la tecla R dispara el rescate (sin lugar elegido usa "cumple")
-document.addEventListener("keydown", (e) => {
-  const escribiendo = e.target.matches("input[type=text], textarea, select");
-  if (e.key.toLowerCase() !== "r" || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+document.addEventListener("keydown", (evento) => {
+  const escribiendo = evento.target.matches("input[type=text], textarea, select");
+  if (evento.key.toLowerCase() !== "r" || evento.ctrlKey || evento.metaKey || evento.altKey || evento.repeat) return;
   if (escribiendo || estado.pantalla !== "inicio") return;
   if (!estado.lugar) {
     estado.lugar = "cumple";
-    $("input[name=lugar][value=cumple]").checked = true;
+    buscar("input[name=lugar][value=cumple]").checked = true;
   }
   rescatar();
 });
 
-$("#btnAtender").addEventListener("click", () => {
-  clearInterval(timbre);
+buscar("#btnAtender").addEventListener("click", () => {
+  clearInterval(idTimbre);
   estado.turnos = 0;
   estado.terminado = false;
   if (hayVoz) speechSynthesis.cancel(); // se habla directo en este clic, sin esperar voiceschanged
-  reloj = setInterval(() => {
+  idReloj = setInterval(() => {
     estado.segundos++;
     render();
   }, 1000);
@@ -240,20 +278,14 @@ $("#btnAtender").addEventListener("click", () => {
   siguienteTurno();
 });
 
-$("#btnRechazar").addEventListener("click", () => {
-  cortarTodo();
-  registrar("rechazo");
-  estado.mensajeFin = "😶 Rechazaste tu propio rescate. Te quedás.";
-  irA("fin");
+buscar("#btnRechazar").addEventListener("click", () => {
+  terminarLlamada("rechazo", "😶", "Rechazaste tu propio rescate. Te quedás.");
 });
 
-$("#btnCortar").addEventListener("click", () => {
-  cortarTodo();
-  registrar("escape");
-  estado.mensajeFin = "🏃 ¡Escapaste con éxito! Nadie sospechó nada.";
-  irA("fin");
+buscar("#btnCortar").addEventListener("click", () => {
+  terminarLlamada("escape", "🏃", "¡Escapaste con éxito! Nadie sospechó nada.");
 });
 
-$("#btnVolver").addEventListener("click", () => irA("inicio"));
+buscar("#btnVolver").addEventListener("click", () => irA("inicio"));
 
 render();

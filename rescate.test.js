@@ -46,8 +46,8 @@ test("R5: cada lugar y nivel tiene un diálogo de 5 turnos que empieza con 'llam
     for (const ganas of [2, 5, 9]) {
       const { dialogo } = armarRescate(id, ganas);
       assert.strictEqual(dialogo.length, 5);
-      dialogo.forEach(({ quien, texto }, i) => {
-        assert.strictEqual(quien, i % 2 === 0 ? "llama" : "vos");
+      dialogo.forEach(({ quien, texto }, posicion) => {
+        assert.strictEqual(quien, posicion % 2 === 0 ? "llama" : "vos");
         assert.ok(typeof texto === "string" && texto.length > 0);
       });
     }
@@ -117,6 +117,26 @@ test("R11: con varias voces en español vos usa otra distinta y quien llama pref
   assert.strictEqual(voces.vos, espana);
   assert.notStrictEqual(voces.llama, voces.vos);
   assert.deepStrictEqual(voces.ajusteVos, { tono: 1, velocidad: 1 });
+});
+
+test("R12: los diálogos usan voseo rioplatense y no tienen malas palabras ni tuteo", () => {
+  const prohibidas = /\b(mierda|carajo|boludo|boluda|pelotud[oa]|puta|puto)\b/i;
+  const tuteo = /\b(tú|tienes|puedes|quieres|vienes|pasas|llegas)\b/i;
+  const rioplatense = /\b(escuchame|escuche|dale|nena|che)\b/i;
+  for (const lugar of LUGARES) {
+    const textos = lugar.dialogos.flat().map((turno) => turno.texto);
+    for (const texto of textos) {
+      assert.doesNotMatch(texto, prohibidas, texto);
+      assert.doesNotMatch(texto, tuteo, texto);
+    }
+    assert.ok(textos.some((texto) => rioplatense.test(texto)), `${lugar.id} sin expresiones rioplatenses`);
+  }
+});
+
+test("R12: cuando quien llama pregunta cuánto tardás, la respuesta de vos da un tiempo", () => {
+  const { dialogo } = armarRescate("cumple", 5);
+  assert.match(dialogo[2].texto, /Cuánto tardás/);
+  assert.match(dialogo[3].texto, /veinte minutos/i);
 });
 
 test("R7: registrarResultado suma un escape o un rechazo", () => {
