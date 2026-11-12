@@ -31,6 +31,7 @@ legend, .pregunta { display: block; width: 100%; font-weight: bold; margin: 22px
 
 /* Grid para la grilla de opciones */
 .opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opciones.tres { grid-template-columns: repeat(3, 1fr); }
 .op {
   min-height: 44px; padding: 14px; border-radius: 12px; cursor: pointer;
   background: var(--tarjeta); border: 2px solid var(--borde);
@@ -46,6 +47,7 @@ input[type=range] { width: 100%; min-height: 44px; accent-color: var(--rojo); }
   font-size: 1.5rem; font-weight: 900; cursor: pointer;
   animation: latido 1.5s infinite;
 }
+#btnRescate:disabled { animation: none; opacity: .6; cursor: default; }
 @keyframes latido {
   from { box-shadow: 0 0 0 0 rgb(255 0 0 / .6); }
   to   { box-shadow: 0 0 0 30px rgb(255 0 0 / 0); }

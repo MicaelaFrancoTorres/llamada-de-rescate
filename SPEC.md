@@ -9,6 +9,7 @@
 | 4 · CSS moderno | `box-sizing: border-box`, variables CSS, Grid para la grilla de opciones, Flexbox para la pantalla de llamada, media query |
 | 5 · JavaScript base | `const`/`let` (sin `var`), `===`, arrow functions, template literals, `??` |
 | 6 · DOM | `querySelector`, `addEventListener`, patrón **estado → render()** |
+| 5 · JavaScript base (ampliación) | `setInterval` para la cuenta regresiva, `Number()` para leer la demora y `??=` para crear el audio una sola vez |
 | 6 · DOM y APIs del navegador | `speechSynthesis` para leer los turnos de la llamada; burbujas de chat dibujadas desde el estado |
 | 7 · Arrays | `find`, `map`, `includes`, `forEach`, `slice` (métodos que no modifican el array) |
 | 8 · Objetos | `LUGARES` es un array de objetos y se usa desestructuración |
@@ -32,7 +33,7 @@
 - **Testigos:** las personas presentes, que ven la "llamada" en la pantalla.
 
 ## 3. Alcance
-- Elegir el lugar y el nivel de ganas.
+- Elegir el lugar, el nivel de ganas y cuándo suena la llamada (Ya, 5 s o 10 s).
 - Simular una llamada entrante con sonido y vibración del avatar.
 - Al atender, mostrar una conversación por turnos (chat y voz) y, al terminar, el guion de escape.
 - Rechazar la llamada o cortar para terminar, y volver al inicio.
@@ -47,11 +48,14 @@
 - **R3:** credibilidad = base del nivel (94 / 78 / 52) − ganas. Tiempo de escape: 120 / 45 / 12 segundos.
 - **R4:** sin lugar elegido, o con ganas fuera de 1–10, no hay rescate (`null`) y se muestra un aviso.
 - **R5:** cada lugar y nivel tiene un `dialogo` de 5 turnos `{quien, texto}`: empieza con "llama", alterna con "vos" y es coherente con la excusa (`decir` es el primer turno de "vos"). Al atender, los turnos se revelan como chat (burbujas: izquierda quien llama, derecha vos). Los de "llama" se leen con `speechSynthesis` (es-AR o es-ES; sin soporte, 2,5 s de espera). Los de "vos" se resaltan "💬 Decí: ..." con 3 s de pausa. Con "🔊 Modo práctica" también se leen los de "vos" (pitch 0.8). Al terminar aparecen los pasos de escape y el botón Cortar. Cortar o rechazar frena la voz.
+- **R6:** la demora puede ser Ya (0 s), 5 s o 10 s (por defecto, Ya). Con demora mayor a 0, entre inicio y sonando hay un estado `esperando` con cuenta regresiva en `#aviso` ("⏳ Sonando en N s..."), y RESCATAME queda deshabilitado.
 
 ## 6. Estados y transiciones
 | Desde | Hacia | Evento |
 |---|---|---|
-| inicio | sonando | Clic en RESCATAME con lugar elegido |
+| inicio | sonando | Clic en RESCATAME con lugar elegido y demora Ya |
+| inicio | esperando | Clic en RESCATAME con lugar elegido y demora de 5 s o 10 s |
+| esperando | sonando | La cuenta regresiva llega a 0 |
 | sonando | en-llamada | Clic en 📞 Atender |
 | sonando | fin | Clic en 📵 Rechazar |
 | en-llamada | fin | Clic en 📵 Cortar y huir (solo visible cuando terminó la conversación) |
@@ -68,11 +72,14 @@
 - **E6:** *Given* estoy en el fin, *When* toco Volver, *Then* vuelvo al inicio con mi lugar y mis ganas **sin cambiar**.
 - **E7 (R5):** *Given* atiendo una llamada, *When* pasan los turnos, *Then* las burbujas de quien llama aparecen a la izquierda y se leen en voz alta, mis frases aparecen a la derecha como "💬 Decí: ...", y al terminar los 5 turnos aparecen los pasos de escape y el botón Cortar.
 - **E8 (R5):** *Given* activé "🔊 Modo práctica", *When* llega un turno mío, *Then* también se lee en voz alta (pitch 0.8) antes de la pausa de 3 s.
+- **E9 (R6):** *Given* elegí "Cumpleaños" y "5 s", *When* toco RESCATAME, *Then* veo "⏳ Sonando en 5 s..." bajando cada segundo, el botón queda deshabilitado y a los 5 s suena la llamada de "Mamá".
 
 ## 8. Casos borde
 - Ganas en los límites: 1, 3, 4, 7, 8 y 10 (cubiertos por los tests).
 - Lugar inexistente o `null` → `null`.
 - Doble clic en RESCATAME mientras suena: no aplica, porque el botón ya no está visible.
+- Doble clic en RESCATAME durante la espera: se ignora, porque el botón está deshabilitado.
+- Con demora el timbre suena fuera del clic: el audio se crea y se reanuda en el clic para que el navegador lo permita.
 - Navegador sin `speechSynthesis`: cada turno de "llama" espera 2,5 s en silencio y la conversación sigue igual.
 - Rechazar o cortar mientras habla la voz: se cancela la lectura y no se revela ningún turno más.
 
@@ -94,6 +101,7 @@
 | T4: Lógica y tests | R1–R4 | E2, E3 | `rescate.js` y `rescate.test.js` (`npm test` en verde) |
 | T5: Interfaz y estados | Transiciones | E1–E6 | `app.js` y prueba manual en el navegador |
 | T6: Conversación por turnos y voz | R5 | E3, E5, E7, E8 | `dialogos` en `rescate.js`, tests R5 y `app.js` |
+| T7: Demora antes de la llamada | R6 | E9 | `index.html` (radios), `app.js` (estado `esperando`) y prueba manual |
 
 ## 12. Preguntas abiertas
 Ninguna crítica.

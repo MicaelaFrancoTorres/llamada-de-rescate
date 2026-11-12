@@ -5,11 +5,14 @@ const estado = {
   turnos: 0,          // cuántos turnos del diálogo ya se revelaron
   terminado: false,   // la conversación llegó al último turno
   practica: false,    // modo práctica: también se leen tus frases
+  demora: 0,          // segundos antes de que suene (0 = ya)
+  espera: 0,          // segundos que faltan en la cuenta regresiva
 };
 
 // Transiciones válidas (spec, sección 6). Cualquier otra se ignora.
 const TRANSICIONES = {
-  inicio: ["sonando"],
+  inicio: ["esperando", "sonando"],
+  esperando: ["sonando"],
   sonando: ["en-llamada", "fin"],
   "en-llamada": ["fin"],
   fin: ["inicio"],
@@ -18,8 +21,10 @@ const TRANSICIONES = {
 const $ = (selector) => document.querySelector(selector);
 const CARAS = ["😐", "😐", "🙂", "😕", "😕", "😩", "😩", "😱", "😱", "🔥"];
 const hayVoz = "speechSynthesis" in window;
+let audio = null;
 let timbre = null;
 let reloj = null;
+let cuenta = null;
 let pausa = null;
 let sesion = 0; // cambia al cortar: ignora callbacks viejos de la voz
 
@@ -31,8 +36,10 @@ function irA(pantalla) {
 
 function render() {
   const { pantalla, rescate } = estado;
-  $("#inicio").hidden = pantalla !== "inicio";
-  $("#llamada").hidden = pantalla === "inicio";
+  const enInicio = pantalla === "inicio" || pantalla === "esperando";
+  $("#inicio").hidden = !enInicio;
+  $("#llamada").hidden = enInicio;
+  $("#btnRescate").disabled = pantalla === "esperando";
   $("#ganasTxt").textContent = `${estado.ganas}/10 ${CARAS[estado.ganas - 1]}`;
   $("#aviso").textContent = estado.aviso;
 
@@ -60,7 +67,6 @@ function render() {
 
 // Sonido generado con el navegador, sin archivos de audio
 function sonarTimbre() {
-  const audio = new AudioContext();
   const tono = () => {
     const oscilador = audio.createOscillator();
     oscilador.frequency.value = 880;
@@ -70,6 +76,11 @@ function sonarTimbre() {
   };
   tono();
   timbre = setInterval(tono, 1500);
+}
+
+function empezarASonar() {
+  sonarTimbre();
+  irA("sonando");
 }
 
 // ===== Conversación: un turno por vez, con voz o con espera =====
@@ -117,6 +128,7 @@ function siguienteTurno() {
 function cortarTodo() {
   clearInterval(timbre);
   clearInterval(reloj);
+  clearInterval(cuenta);
   clearTimeout(pausa);
   sesion++;
   if (hayVoz) speechSynthesis.cancel();
@@ -126,8 +138,14 @@ function cortarTodo() {
 document.querySelectorAll("input[name=lugar]").forEach((radio) => {
   radio.addEventListener("change", () => {
     estado.lugar = radio.value;
-    estado.aviso = "";
+    if (estado.pantalla === "inicio") estado.aviso = "";
     render();
+  });
+});
+
+document.querySelectorAll("input[name=demora]").forEach((radio) => {
+  radio.addEventListener("change", () => {
+    estado.demora = Number(radio.value);
   });
 });
 
@@ -148,8 +166,23 @@ $("#btnRescate").addEventListener("click", () => {
   }
   estado.rescate = rescate;
   estado.segundos = 0;
-  sonarTimbre();
-  irA("sonando");
+  audio ??= new AudioContext();
+  audio.resume(); // el navegador pide un gesto del usuario: se habilita ahora y suena después
+  if (estado.demora === 0) return empezarASonar();
+
+  estado.espera = estado.demora;
+  estado.aviso = `⏳ Sonando en ${estado.espera} s...`;
+  irA("esperando");
+  cuenta = setInterval(() => {
+    estado.espera--;
+    if (estado.espera > 0) {
+      estado.aviso = `⏳ Sonando en ${estado.espera} s...`;
+      return render();
+    }
+    clearInterval(cuenta);
+    estado.aviso = "";
+    empezarASonar();
+  }, 1000);
 });
 
 $("#btnAtender").addEventListener("click", () => {

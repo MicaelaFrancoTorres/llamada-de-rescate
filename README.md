@@ -14,6 +14,7 @@ Lo distinto: la excusa se adapta al lugar y a tu desesperación. Cuantas más ga
 ## Características
 - 🗣️ Conversación por turnos al atender: burbujas de chat, con la voz de quien llama (`speechSynthesis`).
 - 🔊 Modo práctica: también lee tus frases para ensayarlas.
+- ⏳ Demora configurable: la llamada suena ya, a los 5 s o a los 10 s, con cuenta regresiva.
 
 ## Cómo probarlo
 1. Descargar el repositorio y abrir `index.html` en el navegador (doble clic, no hace falta instalar nada).
