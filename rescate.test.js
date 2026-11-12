@@ -1,7 +1,7 @@
 // Tests de la función central. Se corren con: node --test
 const { test } = require("node:test");
 const assert = require("node:assert");
-const { armarRescate, nivelDeGanas, LUGARES, registrarResultado } = require("./rescate.js");
+const { armarRescate, nivelDeGanas, LUGARES, registrarResultado, limpiarNombre } = require("./rescate.js");
 
 test("R1: las ganas definen el nivel (1-3 suave, 4-7 medio, 8-10 extremo)", () => {
   assert.strictEqual(nivelDeGanas(1), 0);
@@ -59,6 +59,23 @@ test("R5: la excusa es el primer turno de 'vos' y el diálogo cambia con el nive
   assert.strictEqual(extremo.decir, extremo.dialogo[1].texto);
   assert.match(extremo.decir, /arito/);
   assert.notDeepStrictEqual(armarRescate("cita", 2).dialogo, extremo.dialogo);
+});
+
+test("R9: limpiarNombre recorta espacios y limita a 20 caracteres", () => {
+  assert.strictEqual(limpiarNombre("  Tía Rosa  "), "Tía Rosa");
+  assert.strictEqual(limpiarNombre("   "), "");
+  assert.strictEqual(limpiarNombre(undefined), "");
+  assert.strictEqual(limpiarNombre("a".repeat(25)), "a".repeat(20));
+  assert.strictEqual([..."🎉".repeat(25)].length, 25);
+  assert.strictEqual([...limpiarNombre("🎉".repeat(25))].length, 20);
+});
+
+test("R9: el nombre personalizado reemplaza al llamador y, si está vacío, vale el del lugar", () => {
+  assert.strictEqual(armarRescate("cumple", 5, "  Tía Rosa ").quien, "Tía Rosa");
+  assert.strictEqual(armarRescate("cumple", 5, "").quien, "Mamá");
+  assert.strictEqual(armarRescate("cumple", 5, "   ").quien, "Mamá");
+  assert.strictEqual(armarRescate("cumple", 5).quien, "Mamá");
+  assert.strictEqual(armarRescate("playa", 5, "Tía Rosa"), null);
 });
 
 test("R7: registrarResultado suma un escape o un rechazo", () => {

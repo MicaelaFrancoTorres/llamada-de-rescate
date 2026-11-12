@@ -28,6 +28,7 @@ const estado = {
   demora: 0,          // segundos antes de que suene (0 = ya)
   espera: 0,          // segundos que faltan en la cuenta regresiva
   historial: leerHistorial(),
+  nombre: "",         // nombre de contacto opcional
 };
 
 // Transiciones válidas (spec, sección 6). Cualquier otra se ignora.
@@ -176,12 +177,16 @@ $("#ganas").addEventListener("input", (e) => {
   render();
 });
 
+$("#nombre").addEventListener("input", (e) => {
+  estado.nombre = e.target.value;
+});
+
 $("#practica").addEventListener("change", (e) => {
   estado.practica = e.target.checked;
 });
 
 function rescatar() {
-  const rescate = armarRescate(estado.lugar, estado.ganas);
+  const rescate = armarRescate(estado.lugar, estado.ganas, estado.nombre);
   if (!rescate) {
     estado.aviso = "⚠️ Primero elegí dónde estás";
     return render();

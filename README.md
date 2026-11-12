@@ -16,6 +16,7 @@ Lo distinto: la excusa se adapta al lugar y a tu desesperación. Cuantas más ga
 - 🔊 Modo práctica: también lee tus frases para ensayarlas.
 - 📍 Ocho lugares, cada uno con su llamador, su excusa y su diálogo en tres niveles de desesperación.
 - 🏆 Historial de escapes y rechazos, guardado en el navegador (`localStorage`).
+- 👤 Nombre personalizado: elegís quién te llama (hasta 20 caracteres).
 - ⌨️ Atajo secreto: la tecla **R** dispara el rescate sin tocar el mouse.
 - ⏳ Demora configurable: la llamada suena ya, a los 5 s o a los 10 s, con cuenta regresiva.
 

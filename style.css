@@ -39,6 +39,10 @@ legend, .pregunta { display: block; width: 100%; font-weight: bold; margin: 22px
 }
 .op:has(input:checked) { border-color: var(--rojo); background: #3a1c22; }
 .op input { accent-color: var(--rojo); }
+input[type=text] {
+  width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 12px; text-align: center;
+  border: 2px solid var(--borde); background: var(--tarjeta); color: var(--texto); font-size: 1rem;
+}
 input[type=range] { width: 100%; min-height: 44px; accent-color: var(--rojo); }
 
 /* Botón de emergencia (ingrediente improbable) */

@@ -145,8 +145,11 @@ const NIVELES = [
 
 const nivelDeGanas = (ganas) => (ganas <= 3 ? 0 : ganas <= 7 ? 1 : 2);
 
-// FUNCIÓN CENTRAL: recibe lugar y ganas, devuelve el rescate o null si la entrada es inválida
-function armarRescate(lugarId, ganas) {
+// Nombre opcional de quien llama: sin espacios en los extremos y de hasta 20 caracteres
+const limpiarNombre = (texto) => [...String(texto ?? "").trim()].slice(0, 20).join("").trim();
+
+// FUNCIÓN CENTRAL: recibe lugar, ganas y un nombre opcional; devuelve el rescate o null si la entrada es inválida
+function armarRescate(lugarId, ganas, nombre) {
   const lugar = LUGARES.find((l) => l.id === lugarId);
   if (!lugar || !Number.isInteger(ganas) || ganas < 1 || ganas > 10) return null;
 
@@ -154,7 +157,7 @@ function armarRescate(lugarId, ganas) {
   const { credibilidad, segundos, pasos } = NIVELES[nivel];
   const dialogo = lugar.dialogos[nivel];
   return {
-    quien: lugar.quien,
+    quien: limpiarNombre(nombre) || lugar.quien,
     avatar: lugar.avatar,
     decir: dialogo.find((turno) => turno.quien === "vos").texto, // la excusa es el primer turno de "vos"
     dialogo,
@@ -179,4 +182,4 @@ function registrarResultado(historial, resultado) {
 }
 
 // Permite importar desde Node para los tests; en el navegador se ignora
-if (typeof module !== "undefined") module.exports = { armarRescate, nivelDeGanas, LUGARES, registrarResultado, normalizarHistorial };
+if (typeof module !== "undefined") module.exports = { armarRescate, nivelDeGanas, LUGARES, registrarResultado, normalizarHistorial, limpiarNombre };
