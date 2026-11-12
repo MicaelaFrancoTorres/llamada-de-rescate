@@ -1,0 +1,8 @@
+{
+  "name": "llamada-de-rescate",
+  "version": "1.0.0",
+  "description": "Botón de emergencia para irte de cualquier lugar sin quedar mal",
+  "scripts": {
+    "test": "node --test"
+  }
+}
