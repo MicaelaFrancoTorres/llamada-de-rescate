@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Llamada de Rescate</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <!-- PANTALLA 1: ENTRADA -->
+    <section id="inicio" aria-labelledby="titulo">
+      <header>
+        <h1 id="titulo">🚨 Llamada de Rescate</h1>
+        <p class="sub">¿Atrapado/a en un lugar del que no te podés ir sin quedar mal?</p>
+      </header>
+
+      <fieldset>
+        <legend>1. ¿Dónde estás?</legend>
+        <div class="opciones">
+          <label class="op"><input type="radio" name="lugar" value="cumple"> 🎂 Cumpleaños</label>
+          <label class="op"><input type="radio" name="lugar" value="familia"> 👵 Reunión familiar</label>
+          <label class="op"><input type="radio" name="lugar" value="cita"> 💔 Cita</label>
+          <label class="op"><input type="radio" name="lugar" value="trabajo"> 💼 Trabajo</label>
+        </div>
+      </fieldset>
+
+      <label for="ganas" class="pregunta">2. ¿Cuántas ganas tenés de irte?</label>
+      <input type="range" id="ganas" min="1" max="10" value="5">
+      <p id="ganasTxt"></p>
+
+      <button id="btnRescate" type="button">RESCATAME</button>
+      <p id="aviso" role="alert"></p>
+    </section>
+
+    <!-- PANTALLA 2: LLAMADA FALSA -->
+    <section id="llamada" aria-live="polite" hidden>
+      <div id="avatar" aria-hidden="true"></div>
+      <h2 id="quien"></h2>
+      <p id="estado"></p>
+
+      <article id="guion" hidden>
+        <h3>📜 Tu guion de escape</h3>
+        <p id="decir"></p>
+        <ol id="pasos"></ol>
+        <p id="dato"></p>
+      </article>
+
+      <div id="fin" hidden>
+        <p id="mensajeFin"></p>
+        <button id="btnVolver" type="button">← Volver</button>
+      </div>
+
+      <div id="entrante" class="botones">
+        <button id="btnRechazar" class="circ rojo" type="button" aria-label="Rechazar llamada">📵</button>
+        <button id="btnAtender" class="circ verde" type="button" aria-label="Atender llamada">📞</button>
+      </div>
+      <button id="btnCortar" class="circ rojo" type="button" aria-label="Cortar y huir" hidden>📵</button>
+    </section>
+  </main>
+
+  <script src="rescate.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
