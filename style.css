@@ -1,0 +1,78 @@
+/* Variables CSS para colores (clase 4) */
+:root {
+  --fondo: #12121a;
+  --tarjeta: #1e1e2b;
+  --borde: #2e2e40;
+  --texto: #f1f1f5;
+  --suave: #a3a3b5;
+  --rojo: #e03131;
+  --verde: #2fb24f;
+  --acento: #ffd166;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--fondo);
+  color: var(--texto);
+  text-align: center;
+}
+main { max-width: 420px; margin: auto; padding: 24px 16px; }
+.sub { color: var(--suave); }
+
+/* Foco visible para teclado (clase 3) */
+:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }
+
+fieldset { border: none; padding: 0; margin: 0; }
+legend, .pregunta { display: block; width: 100%; font-weight: bold; margin: 22px 0 10px; color: #ffb4b4; }
+
+/* Grid para la grilla de opciones */
+.opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.op {
+  min-height: 44px; padding: 14px; border-radius: 12px; cursor: pointer;
+  background: var(--tarjeta); border: 2px solid var(--borde);
+}
+.op:has(input:checked) { border-color: var(--rojo); background: #3a1c22; }
+.op input { accent-color: var(--rojo); }
+input[type=range] { width: 100%; min-height: 44px; accent-color: var(--rojo); }
+
+/* Botón de emergencia (ingrediente improbable) */
+#btnRescate {
+  width: 200px; height: 200px; margin-top: 16px; border-radius: 50%;
+  border: 8px solid #7a0d0d; background: #e00000; color: #fff;
+  font-size: 1.5rem; font-weight: 900; cursor: pointer;
+  animation: latido 1.5s infinite;
+}
+@keyframes latido {
+  from { box-shadow: 0 0 0 0 rgb(255 0 0 / .6); }
+  to   { box-shadow: 0 0 0 30px rgb(255 0 0 / 0); }
+}
+
+/* Pantalla de llamada: Flexbox en columna */
+#llamada {
+  position: fixed; inset: 0; padding: 50px 20px;
+  background: linear-gradient(#2b3a55, #121826);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+#avatar { width: 110px; height: 110px; border-radius: 50%; background: #4a5a7a; font-size: 4rem; line-height: 110px; }
+.sonando #avatar { animation: vibra .25s infinite; }
+@keyframes vibra { 50% { transform: rotate(8deg); } }
+
+#guion { width: 100%; max-width: 420px; background: #0006; border-radius: 14px; padding: 14px; text-align: left; }
+#guion h3 { color: var(--acento); margin: 0; }
+#dato { color: #9fe3b0; }
+
+.botones { display: flex; gap: 80px; margin-top: auto; }
+#btnCortar { margin-top: auto; }
+.circ { width: 70px; height: 70px; border-radius: 50%; border: none; font-size: 2rem; cursor: pointer; }
+.verde { background: var(--verde); }
+.rojo { background: var(--rojo); }
+#btnVolver { min-height: 44px; padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; }
+
+/* Media query: pantallas grandes */
+@media (min-width: 768px) {
+  h1 { font-size: 2.6rem; }
+}
