@@ -24,7 +24,6 @@ const estado = {
   pantalla: "inicio", lugar: null, ganas: 5, rescate: null, segundos: 0, aviso: "", mensajeFin: "",
   turnos: 0,          // cuántos turnos del diálogo ya se revelaron
   terminado: false,   // la conversación llegó al último turno
-  practica: false,    // modo práctica: también se leen tus frases
   demora: 0,          // segundos antes de que suene (0 = ya)
   espera: 0,          // segundos que faltan en la cuenta regresiva
   historial: leerHistorial(),
@@ -112,14 +111,20 @@ function esperar(ms, accion) {
   pausa = setTimeout(accion, ms);
 }
 
-function leer(texto, pitch, alTerminar) {
+// Quien llama suena con la voz de su personaje; vos, siempre con una voz distinta
+function ajusteDeVoz(quien) {
+  const { llama, vos, ajusteVos } = elegirVoces(speechSynthesis.getVoices());
+  if (quien === "llama") return { voz: llama, ...estado.rescate.voz };
+  return { voz: vos ?? llama, ...ajusteVos };
+}
+
+function leer(texto, { voz, tono, velocidad }, alTerminar) {
   const miSesion = sesion;
-  const voces = speechSynthesis.getVoices();
-  const voz = voces.find((v) => v.lang.replace("_", "-") === "es-AR") ?? voces.find((v) => v.lang.startsWith("es-ES"));
   const lectura = new SpeechSynthesisUtterance(texto);
-  lectura.lang = voz?.lang ?? "es-AR";
+  lectura.lang = voz?.lang ?? "es-AR"; // sin voz en español: la voz por defecto, en es-AR
   if (voz) lectura.voice = voz;
-  lectura.pitch = pitch;
+  lectura.pitch = tono;
+  lectura.rate = velocidad;
 
   let listo = false;
   const fin = () => {
@@ -143,8 +148,8 @@ function siguienteTurno() {
   estado.turnos++;
   render();
 
-  const seguir = () => esperar(quien === "llama" ? (hayVoz ? 500 : 2500) : 3000, siguienteTurno);
-  if (hayVoz && (quien === "llama" || estado.practica)) leer(texto, quien === "llama" ? 1 : 0.8, seguir);
+  const seguir = () => esperar(hayVoz ? 500 : quien === "llama" ? 2500 : 3000, siguienteTurno);
+  if (hayVoz) leer(texto, ajusteDeVoz(quien), seguir);
   else seguir();
 }
 
@@ -179,10 +184,6 @@ $("#ganas").addEventListener("input", (e) => {
 
 $("#nombre").addEventListener("input", (e) => {
   estado.nombre = e.target.value;
-});
-
-$("#practica").addEventListener("change", (e) => {
-  estado.practica = e.target.checked;
 });
 
 function rescatar() {
@@ -230,6 +231,7 @@ $("#btnAtender").addEventListener("click", () => {
   clearInterval(timbre);
   estado.turnos = 0;
   estado.terminado = false;
+  if (hayVoz) speechSynthesis.cancel(); // se habla directo en este clic, sin esperar voiceschanged
   reloj = setInterval(() => {
     estado.segundos++;
     render();

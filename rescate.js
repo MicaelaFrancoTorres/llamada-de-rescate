@@ -6,7 +6,7 @@ const armarDialogo = (...textos) => textos.map((texto, i) => ({ quien: i % 2 ===
 // Array de objetos: cada lugar es una entidad con sus atributos (clase 8).
 // `dialogos` tiene un diálogo por nivel (0 = suave, 1 = medio, 2 = extremo)
 const LUGARES = [
-  { id: "cumple", nombre: "🎂 Cumpleaños", quien: "Mamá", avatar: "👩", dialogos: [
+  { id: "cumple", nombre: "🎂 Cumpleaños", quien: "Mamá", voz: { tono: 1.2, velocidad: 1 }, avatar: "👩", dialogos: [
     armarDialogo("Hola, ¿cómo andás? Te llamo rápido: ¿pasás por la panadería cuando vuelvas?",
       "Sí, ahora voy. No me olvido del pan.",
       "Dale, traé también medialunas. Y no te olvides, ¿eh?",
@@ -22,7 +22,7 @@ const LUGARES = [
       "¡Ya llega al living! ¡Corré!",
       "¡No toques nada, ma, llego en cinco minutos!",
       "¡Apurate, apurate!")] },
-  { id: "familia", nombre: "👵 Reunión familiar", quien: "Vecina Marta", avatar: "👵", dialogos: [
+  { id: "familia", nombre: "👵 Reunión familiar", quien: "Vecina Marta", voz: { tono: 1.3, velocidad: 0.9 }, avatar: "👵", dialogos: [
     armarDialogo("Hola, soy Marta. Te llegó un paquete y lo recibí yo.",
       "¿Un paquete para mí? Bueno, voy a buscarlo.",
       "Sí, es una caja grande. No corras, pasá cuando puedas.",
@@ -38,7 +38,7 @@ const LUGARES = [
       "¡Está mirando para adentro, me da miedo! ¿Llamo a la policía?",
       "Esperá, Marta, no hagas nada, llego en diez minutos.",
       "¡Apurate, por favor!")] },
-  { id: "cita", nombre: "💔 Cita", quien: "Mejor amiga", avatar: "👯", dialogos: [
+  { id: "cita", nombre: "💔 Cita", quien: "Mejor amiga", voz: { tono: 1.4, velocidad: 1.1 }, avatar: "👯", dialogos: [
     armarDialogo("Amiga, ¿cómo estás? Che, ¿te acordás que hoy me mudo?",
       "¿Te ayudo con la mudanza hoy? Dame un rato y voy.",
       "¡Sí, por favor! Está todo en cajas, necesito manos.",
@@ -54,7 +54,7 @@ const LUGARES = [
       "¡Sí, y está raro! ¡Hay que llevarlo al veterinario ya!",
       "Quedate tranquila, salgo corriendo y lo llevamos.",
       "¡Dale, dale, apurate!")] },
-  { id: "trabajo", nombre: "💼 Trabajo", quien: "Soporte Técnico", avatar: "🧑‍💻", dialogos: [
+  { id: "trabajo", nombre: "💼 Trabajo", quien: "Soporte Técnico", voz: { tono: 0.7, velocidad: 1 }, avatar: "🧑‍💻", dialogos: [
     armarDialogo("Buenas, te llamamos de Soporte Técnico por una verificación pendiente.",
       "Tengo que confirmar unos datos, ya vuelvo.",
       "Perfecto, necesitamos que confirmes tu usuario cuando puedas.",
@@ -70,7 +70,7 @@ const LUGARES = [
       "¡Y se perdieron datos de clientes! ¡Hace falta que vengas!",
       "¡No lo apaguen hasta que llegue, salgo ahora!",
       "¡Dale, rápido!")] },
-  { id: "clase", nombre: "📚 Clase aburrida", quien: "Hermano/a", avatar: "🧒", dialogos: [
+  { id: "clase", nombre: "📚 Clase aburrida", quien: "Hermano/a", voz: { tono: 1.1, velocidad: 1.15 }, avatar: "🧒", dialogos: [
     armarDialogo("Hola, soy yo. Me olvidé los apuntes de mate en casa.",
       "Bueno, ya te llevo los apuntes, esperame un rato.",
       "Dale, los necesito antes de la siguiente clase.",
@@ -86,7 +86,7 @@ const LUGARES = [
       "¡Hay mucho humo y no sé qué hacer!",
       "¡Tapala con una tapa y salí de la cocina, ya llego!",
       "¡Apurate, por favor!")] },
-  { id: "asado", nombre: "🍖 Asado eterno", quien: "Abuela", avatar: "🧓", dialogos: [
+  { id: "asado", nombre: "🍖 Asado eterno", quien: "Abuela", voz: { tono: 1.3, velocidad: 0.8 }, avatar: "🧓", dialogos: [
     armarDialogo("Hola, mi vida. Te guardé un tupper de ravioles.",
       "Gracias, abuela, paso a buscarlo ahora.",
       "Pasá antes de la noche, que se enfrían.",
@@ -102,7 +102,7 @@ const LUGARES = [
       "Me duele la pierna, pero estoy bien. Vení.",
       "¡Llamo a una ambulancia y salgo ya!",
       "¡Apurate, por favor!")] },
-  { id: "consorcio", nombre: "🏢 Reunión de consorcio", quien: "Cerrajero", avatar: "🔑", dialogos: [
+  { id: "consorcio", nombre: "🏢 Reunión de consorcio", quien: "Cerrajero", voz: { tono: 0.6, velocidad: 0.95 }, avatar: "🔑", dialogos: [
     armarDialogo("Buenas tardes, soy el cerrajero. Tenía un turno para cambiar la cerradura.",
       "Ah, sí, el turno del cerrajero. Ya me acerco.",
       "Estoy en la puerta de su casa, sin apuro.",
@@ -118,7 +118,7 @@ const LUGARES = [
       "Me dijeron que había una emergencia, ya casi la abro.",
       "¡Espere, no rompa nada, salgo ahora!",
       "Ok, lo espero un minuto nomás.")] },
-  { id: "sala", nombre: "🩺 Sala de espera", quien: "Trabajo", avatar: "💼", dialogos: [
+  { id: "sala", nombre: "🩺 Sala de espera", quien: "Trabajo", voz: { tono: 0.8, velocidad: 1.05 }, avatar: "💼", dialogos: [
     armarDialogo("Hola, te llamo de la oficina. Necesitamos que firmes un papel.",
       "Sí, claro, ahora paso por la oficina.",
       "No es urgente, pero que sea antes de las seis.",
@@ -159,6 +159,7 @@ function armarRescate(lugarId, ganas, nombre) {
   return {
     quien: limpiarNombre(nombre) || lugar.quien,
     avatar: lugar.avatar,
+    voz: lugar.voz, // tono y velocidad de quien llama
     decir: dialogo.find((turno) => turno.quien === "vos").texto, // la excusa es el primer turno de "vos"
     dialogo,
     pasos,
@@ -181,5 +182,16 @@ function registrarResultado(historial, resultado) {
   return { escapes, rechazos };
 }
 
+// Voces: una para quien llama (es-AR si hay) y otra, distinta, para tus respuestas
+const AJUSTE_VOS_CON_UNA_VOZ = { tono: 0.9, velocidad: 1.05 };
+const normalizarIdioma = (voz) => String(voz.lang ?? "").replace("_", "-").toLowerCase();
+
+function elegirVoces(voces) {
+  const espanolas = voces.filter((voz) => normalizarIdioma(voz).startsWith("es"));
+  const llama = espanolas.find((voz) => normalizarIdioma(voz) === "es-ar") ?? espanolas[0] ?? null;
+  const vos = espanolas.find((voz) => voz !== llama) ?? null;
+  return { llama, vos, ajusteVos: vos ? { tono: 1, velocidad: 1 } : AJUSTE_VOS_CON_UNA_VOZ };
+}
+
 // Permite importar desde Node para los tests; en el navegador se ignora
-if (typeof module !== "undefined") module.exports = { armarRescate, nivelDeGanas, LUGARES, registrarResultado, normalizarHistorial, limpiarNombre };
+if (typeof module !== "undefined") module.exports = { armarRescate, nivelDeGanas, LUGARES, registrarResultado, normalizarHistorial, limpiarNombre, elegirVoces };

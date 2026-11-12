@@ -35,7 +35,7 @@ Lo distinto: todo se adapta al lugar y a tu desesperación. Cuantas más ganas t
 - 📍 **Ocho lugares**, cada uno con su propio llamador, su excusa y su diálogo.
 - 🎚️ **Tres niveles de desesperación** (suave, medio y extremo) que cambian la excusa, los pasos, la credibilidad y el tiempo de escape.
 - 🗣️ **Conversación por turnos** con burbujas de chat: quien llama a la izquierda, vos a la derecha.
-- 🔊 **Voz** para quien llama (`speechSynthesis`, es-AR o es-ES) y **modo práctica**, que también lee tus frases para ensayarlas.
+- 🔊 **Voz** para toda la conversación (`speechSynthesis`): cada personaje con su tono y velocidad, y tus respuestas con una voz distinta.
 - ⏳ **Demora configurable**: la llamada suena ya, a los 5 s o a los 10 s, con cuenta regresiva.
 - 👤 **Nombre personalizado**: elegís quién te llama (hasta 20 caracteres).
 - 🏆 **Historial** de escapes y rechazos, guardado en el navegador.
@@ -91,7 +91,7 @@ Descargá el repositorio y abrí `index.html` en el navegador (doble clic, no ha
 | E5 | Cortar al terminar la conversación | Se frena el contador y dice "¡Escapaste con éxito!" |
 | E6 | Volver desde el final | Volvés al inicio con tu lugar y tus ganas sin cambiar |
 | E7 | Atender una llamada | Las burbujas aparecen de a una, se leen en voz alta y al final salen los pasos y el botón Cortar |
-| E8 | Activar "🔊 Modo práctica" y atender | También se leen tus frases, con una voz más grave |
+| E8 | Atender y esperar los 5 turnos | Se lee todo en orden, y tus frases suenan con otra voz |
 | E9 | Elegir "5 s" y tocar RESCATAME | Cuenta regresiva en pantalla y a los 5 s suena |
 | E10 | Elegir Asado eterno y atender | Llama "Abuela" |
 | E11 | Cortar una llamada y rechazar otra | El historial muestra 1 escape y 1 rechazo, y se mantiene al recargar |

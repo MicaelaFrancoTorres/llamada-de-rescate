@@ -1,7 +1,7 @@
 // Tests de la función central. Se corren con: node --test
 const { test } = require("node:test");
 const assert = require("node:assert");
-const { armarRescate, nivelDeGanas, LUGARES, registrarResultado, limpiarNombre } = require("./rescate.js");
+const { armarRescate, nivelDeGanas, LUGARES, registrarResultado, limpiarNombre, elegirVoces } = require("./rescate.js");
 
 test("R1: las ganas definen el nivel (1-3 suave, 4-7 medio, 8-10 extremo)", () => {
   assert.strictEqual(nivelDeGanas(1), 0);
@@ -76,6 +76,47 @@ test("R9: el nombre personalizado reemplaza al llamador y, si está vacío, vale
   assert.strictEqual(armarRescate("cumple", 5, "   ").quien, "Mamá");
   assert.strictEqual(armarRescate("cumple", 5).quien, "Mamá");
   assert.strictEqual(armarRescate("playa", 5, "Tía Rosa"), null);
+});
+
+test("R10: cada personaje tiene su tono y su velocidad", () => {
+  const esperadas = {
+    cumple: [1.2, 1], familia: [1.3, 0.9], cita: [1.4, 1.1], trabajo: [0.7, 1],
+    clase: [1.1, 1.15], asado: [1.3, 0.8], consorcio: [0.6, 0.95], sala: [0.8, 1.05],
+  };
+  for (const { id } of LUGARES) {
+    const { tono, velocidad } = armarRescate(id, 5).voz;
+    assert.deepStrictEqual([tono, velocidad], esperadas[id], id);
+  }
+});
+
+test("R10: el nombre personalizado no cambia la voz del lugar", () => {
+  assert.deepStrictEqual(armarRescate("asado", 5, "Tía Rosa").voz, { tono: 1.3, velocidad: 0.8 });
+});
+
+test("R11: sin voces en español no se elige ninguna y vos usa tono 0.9 y velocidad 1.05", () => {
+  const voces = elegirVoces([{ lang: "en-US", name: "Inglesa" }]);
+  assert.strictEqual(voces.llama, null);
+  assert.strictEqual(voces.vos, null);
+  assert.deepStrictEqual(voces.ajusteVos, { tono: 0.9, velocidad: 1.05 });
+  assert.strictEqual(elegirVoces([]).llama, null);
+});
+
+test("R11: con una sola voz en español vos usa la misma voz con otro ajuste", () => {
+  const unica = { lang: "es_ES", name: "Unica" };
+  const voces = elegirVoces([{ lang: "en-US", name: "Inglesa" }, unica]);
+  assert.strictEqual(voces.llama, unica);
+  assert.strictEqual(voces.vos, null);
+  assert.deepStrictEqual(voces.ajusteVos, { tono: 0.9, velocidad: 1.05 });
+});
+
+test("R11: con varias voces en español vos usa otra distinta y quien llama prefiere es-AR", () => {
+  const espana = { lang: "es-ES", name: "Espana" };
+  const argentina = { lang: "es_AR", name: "Argentina" };
+  const voces = elegirVoces([espana, argentina]);
+  assert.strictEqual(voces.llama, argentina);
+  assert.strictEqual(voces.vos, espana);
+  assert.notStrictEqual(voces.llama, voces.vos);
+  assert.deepStrictEqual(voces.ajusteVos, { tono: 1, velocidad: 1 });
 });
 
 test("R7: registrarResultado suma un escape o un rechazo", () => {

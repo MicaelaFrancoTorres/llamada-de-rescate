@@ -77,8 +77,6 @@ input[type=range] { width: 100%; min-height: 44px; accent-color: var(--rojo); }
 .burbuja { margin: 0; padding: 8px 12px; border-radius: 14px; max-width: 85%; }
 .burbuja.llama { align-self: flex-start; background: #33415c; border-bottom-left-radius: 4px; }
 .burbuja.vos { align-self: flex-end; background: #1f6f3a; border: 2px solid var(--acento); border-bottom-right-radius: 4px; font-weight: bold; }
-.practica { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; margin-top: 8px; cursor: pointer; }
-
 .botones { display: flex; gap: 80px; margin-top: auto; }
 #btnCortar { margin-top: auto; }
 .circ { width: 70px; height: 70px; border-radius: 50%; border: none; font-size: 2rem; cursor: pointer; }

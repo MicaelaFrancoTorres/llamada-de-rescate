@@ -11,7 +11,7 @@
 | 6 · DOM | `querySelector`, `addEventListener`, patrón **estado → render()** |
 | 5 · JavaScript base (ampliación) | `setInterval` para la cuenta regresiva, `Number()` para leer la demora y `??=` para crear el audio una sola vez |
 | 6 · DOM y APIs del navegador | `speechSynthesis` para leer los turnos de la llamada; burbujas de chat dibujadas desde el estado |
-| 7 · Arrays | `find`, `map`, `includes`, `forEach`, `slice` (métodos que no modifican el array) |
+| 7 · Arrays | `find`, `map`, `includes`, `forEach`, `slice`, `filter` (métodos que no modifican el array) |
 | 7 · Arrays y 8 · Objetos (inmutabilidad) | `registrarResultado` devuelve un objeto nuevo con desestructuración, sin mutar el historial recibido |
 | 5 · JavaScript base (texto) | `trim`, spread de string para contar caracteres sin partir emojis, y `||` para el valor por defecto |
 | 6 · DOM (eventos de teclado) | `keydown` en `document`, `e.key` y `matches` para ignorar los campos de texto |
@@ -51,9 +51,11 @@
 - **R7:** el historial es `{escapes, rechazos}`. `registrarResultado(historial, resultado)` es una función pura: con "escape" suma un escape, con "rechazo" suma un rechazo, y devuelve siempre un objeto **nuevo** sin mutar el recibido. Un historial inválido cuenta como 0. Cortar la llamada registra un escape; rechazarla, un rechazo. Se guarda en `localStorage` (con `try/catch`) y se muestra en el inicio: "🏃 Escapes exitosos: N · 😶 Rechazados: M".
 - **R8:** en el estado inicio, la tecla R (sin Ctrl, Alt ni Meta) dispara el rescate igual que el botón RESCATAME, con la misma demora. Si no hay lugar elegido usa "cumple" y lo marca en pantalla. No se activa mientras se escribe en un campo de texto, ni en otros estados. En el inicio se ve el texto chico "Atajo secreto: tecla R".
 - **R9:** el nombre de contacto es opcional ("¿Quién querés que te llame?"). `limpiarNombre` le quita los espacios de los extremos y lo corta en 20 caracteres. Si queda un nombre, reemplaza al llamador del lugar (R2); si queda vacío, vale el llamador de siempre. No cambia el diálogo.
+- **R10:** cada lugar tiene una voz propia `voz: {tono, velocidad}`, que se usa en los turnos de quien llama: Mamá 1,2 / 1; Vecina Marta 1,3 / 0,9; Mejor amiga 1,4 / 1,1; Soporte Técnico 0,7 / 1; Hermano/a 1,1 / 1,15; Abuela 1,3 / 0,8; Cerrajero 0,6 / 0,95; Trabajo 0,8 / 1,05. La voz es del personaje: si se personaliza el nombre (R9), sigue siendo la del lugar. Se prefiere una voz en español (primero es-AR); si el navegador no tiene ninguna, se usa la voz por defecto con `lang` "es-AR". La lectura arranca directo en el clic de Atender, con `speechSynthesis.cancel()` antes y sin esperar `voiceschanged`.
+- **R11:** los turnos de "vos" se leen SIEMPRE con una voz distinta a la de quien llama: otra voz en español si hay más de una (tono 1, velocidad 1); si hay una sola, la misma voz con tono 0,9 y velocidad 1,05. `elegirVoces(voces)` es una función pura. Se lee la conversación completa (llama, vos, llama, vos, llama) con 0,5 s entre turnos. Como las respuestas ya se leen siempre, se elimina el interruptor "Modo práctica".
 - **R3:** credibilidad = base del nivel (94 / 78 / 52) − ganas. Tiempo de escape: 120 / 45 / 12 segundos.
 - **R4:** sin lugar elegido, o con ganas fuera de 1–10, no hay rescate (`null`) y se muestra un aviso.
-- **R5:** cada lugar y nivel tiene un `dialogo` de 5 turnos `{quien, texto}`: empieza con "llama", alterna con "vos" y es coherente con la excusa (`decir` es el primer turno de "vos"). Al atender, los turnos se revelan como chat (burbujas: izquierda quien llama, derecha vos). Los de "llama" se leen con `speechSynthesis` (es-AR o es-ES; sin soporte, 2,5 s de espera). Los de "vos" se resaltan "💬 Decí: ..." con 3 s de pausa. Con "🔊 Modo práctica" también se leen los de "vos" (pitch 0.8). Al terminar aparecen los pasos de escape y el botón Cortar. Cortar o rechazar frena la voz.
+- **R5:** cada lugar y nivel tiene un `dialogo` de 5 turnos `{quien, texto}`: empieza con "llama", alterna con "vos" y es coherente con la excusa (`decir` es el primer turno de "vos"). Al atender, los turnos se revelan como chat (burbujas: izquierda quien llama, derecha vos). Todos los turnos se leen con `speechSynthesis` (voces en R10 y R11) y los de "vos" se resaltan "💬 Decí: ...". Sin soporte de voz, los de "llama" esperan 2,5 s y los de "vos" 3 s. Al terminar aparecen los pasos de escape y el botón Cortar. Cortar o rechazar frena la voz.
 - **R6:** la demora puede ser Ya (0 s), 5 s o 10 s (por defecto, Ya). Con demora mayor a 0, entre inicio y sonando hay un estado `esperando` con cuenta regresiva en `#aviso` ("⏳ Sonando en N s..."), y RESCATAME queda deshabilitado.
 
 ## 6. Estados y transiciones
@@ -77,13 +79,14 @@
 - **E5:** *Given* estoy en la llamada y terminó la conversación, *When* toco Cortar, *Then* se frena el contador, se corta la voz y veo "¡Escapaste con éxito!".
 - **E6:** *Given* estoy en el fin, *When* toco Volver, *Then* vuelvo al inicio con mi lugar y mis ganas **sin cambiar**.
 - **E7 (R5):** *Given* atiendo una llamada, *When* pasan los turnos, *Then* las burbujas de quien llama aparecen a la izquierda y se leen en voz alta, mis frases aparecen a la derecha como "💬 Decí: ...", y al terminar los 5 turnos aparecen los pasos de escape y el botón Cortar.
-- **E8 (R5):** *Given* activé "🔊 Modo práctica", *When* llega un turno mío, *Then* también se lee en voz alta (pitch 0.8) antes de la pausa de 3 s.
+- **E8 (R11):** *Given* atiendo una llamada, *When* llega un turno mío, *Then* se lee en voz alta con una voz distinta a la de quien llama, y los 5 turnos se leen en orden: llama, vos, llama, vos, llama.
 - **E9 (R6):** *Given* elegí "Cumpleaños" y "5 s", *When* toco RESCATAME, *Then* veo "⏳ Sonando en 5 s..." bajando cada segundo, el botón queda deshabilitado y a los 5 s suena la llamada de "Mamá".
 - **E10 (R2, R5):** *Given* elijo "Asado eterno" con ganas 5, *When* toco RESCATAME y atiendo, *Then* llama "Abuela" y la conversación habla de la luz cortada. Lo mismo vale para "Clase aburrida" (Hermano/a), "Reunión de consorcio" (Cerrajero) y "Sala de espera" (Trabajo).
 - **E11 (R7):** *Given* el historial dice "Escapes exitosos: 0 · Rechazados: 0", *When* corto una llamada y después rechazo otra, *Then* al volver al inicio veo "🏃 Escapes exitosos: 1 · 😶 Rechazados: 1", y sigue así después de recargar la página.
 - **E12 (R8):** *Given* estoy en el inicio sin elegir lugar, *When* toco la tecla R, *Then* se marca "Cumpleaños" y suena la llamada de "Mamá" (o empieza la cuenta regresiva si elegí demora). *Given* estoy escribiendo en un campo de texto o ya hay una llamada, *When* toco R, *Then* no pasa nada.
 - **E13 (R9):** *Given* escribí "  Tía Rosa  " en el nombre y elegí "Cumpleaños", *When* toco RESCATAME, *Then* suena una llamada de "Tía Rosa" en vez de "Mamá". *Given* dejé el campo vacío, *Then* llama "Mamá".
 - **E14 (CI):** *Given* hago push o abro un pull request a `main`, *When* termina el workflow "CI", *Then* `npm test` corrió con Node 22 y la pestaña Actions muestra el resultado (verde si pasan todos los tests).
+- **E15 (R10):** *Given* elijo "Asado eterno" y después "Reunión de consorcio", *When* atiendo cada llamada, *Then* la Abuela suena aguda y lenta (tono 1,3 / velocidad 0,8) y el Cerrajero grave (tono 0,6 / velocidad 0,95). Con el nombre "Tía Rosa" la voz sigue siendo la del lugar.
 
 ## 8. Casos borde
 - Ganas en los límites: 1, 3, 4, 7, 8 y 10 (cubiertos por los tests).
@@ -94,14 +97,15 @@
 - Los 8 lugares existen en los 3 niveles: un test recorre todos para que no falte ninguna combinación.
 - Doble clic en RESCATAME durante la espera: se ignora, porque el botón está deshabilitado.
 - Con demora el timbre suena fuera del clic: el audio se crea y se reanuda en el clic para que el navegador lo permita.
-- Navegador sin `speechSynthesis`: cada turno de "llama" espera 2,5 s en silencio y la conversación sigue igual.
+- Navegador sin `speechSynthesis`: los turnos de "llama" esperan 2,5 s y los de "vos" 3 s en silencio, y la conversación sigue igual.
+- El navegador todavía no cargó las voces al atender: se habla igual con la voz por defecto y `lang` "es-AR", y los turnos siguientes vuelven a buscar voces en español.
+- Una sola voz en español disponible: "vos" usa esa voz con tono 0,9 y velocidad 1,05, para que no suene igual que quien llama.
 - Rechazar o cortar mientras habla la voz: se cancela la lectura y no se revela ningún turno más.
 
 ## 9. Accesibilidad
 - Etiquetas `label`, `fieldset` y `legend` en el formulario. Todo se puede usar con teclado (Tab, flechas y Enter).
 - Foco visible, botones de 44 px como mínimo y `aria-label` en los botones que solo tienen emoji.
-- El chat vive dentro de la región `aria-live="polite"`, así que un lector de pantalla anuncia cada turno nuevo. El modo práctica es opcional.
-
+- El chat vive dentro de la región `aria-live="polite"`, así que un lector de pantalla anuncia cada turno nuevo.
 ## 10. Plan
 - HTML semántico, CSS con variables y JavaScript sin frameworks: se abre con doble clic.
 - `rescate.js` tiene la lógica pura (testeable) y `app.js` la interfaz con el patrón **estado → render**.
@@ -122,6 +126,7 @@
 | T10: Atajo de teclado secreto | R8 | E12 | `app.js` (`rescatar()` y `keydown`) y prueba manual |
 | T11: Nombre de contacto personalizado | R9 | E13 | `limpiarNombre` y `armarRescate` con tests en `rescate.js`, input en `index.html` |
 | T12: Integración continua | R1–R9 | E14 | `.github/workflows/ci.yml` y la pestaña Actions de GitHub |
+| T13: Voces por personaje y para las respuestas | R10, R11 | E7, E8, E15 | `voz` en `LUGARES` y `elegirVoces` con tests en `rescate.js`, `leer()` en `app.js` |
 
 ## 12. Preguntas abiertas
 Ninguna crítica.
