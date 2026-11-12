@@ -15,6 +15,7 @@ Lo distinto: la excusa se adapta al lugar y a tu desesperación. Cuantas más ga
 - 🗣️ Conversación por turnos al atender: burbujas de chat, con la voz de quien llama (`speechSynthesis`).
 - 🔊 Modo práctica: también lee tus frases para ensayarlas.
 - 📍 Ocho lugares, cada uno con su llamador, su excusa y su diálogo en tres niveles de desesperación.
+- 🏆 Historial de escapes y rechazos, guardado en el navegador (`localStorage`).
 - ⏳ Demora configurable: la llamada suena ya, a los 5 s o a los 10 s, con cuenta regresiva.
 
 ## Cómo probarlo

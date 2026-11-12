@@ -1,5 +1,25 @@
 // Interfaz: los datos viven en `estado` y `render()` dibuja la pantalla (clase 6)
 
+const CLAVE_HISTORIAL = "rescate-historial";
+
+// localStorage puede estar bloqueado o tener datos rotos: en ese caso se arranca en 0
+function leerHistorial() {
+  try {
+    return normalizarHistorial(JSON.parse(localStorage.getItem(CLAVE_HISTORIAL)));
+  } catch {
+    return normalizarHistorial(null);
+  }
+}
+
+function registrar(resultado) {
+  estado.historial = registrarResultado(estado.historial, resultado);
+  try {
+    localStorage.setItem(CLAVE_HISTORIAL, JSON.stringify(estado.historial));
+  } catch {
+    // sin almacenamiento: el contador sigue en memoria
+  }
+}
+
 const estado = {
   pantalla: "inicio", lugar: null, ganas: 5, rescate: null, segundos: 0, aviso: "", mensajeFin: "",
   turnos: 0,          // cuántos turnos del diálogo ya se revelaron
@@ -7,6 +27,7 @@ const estado = {
   practica: false,    // modo práctica: también se leen tus frases
   demora: 0,          // segundos antes de que suene (0 = ya)
   espera: 0,          // segundos que faltan en la cuenta regresiva
+  historial: leerHistorial(),
 };
 
 // Transiciones válidas (spec, sección 6). Cualquier otra se ignora.
@@ -42,6 +63,7 @@ function render() {
   $("#btnRescate").disabled = pantalla === "esperando";
   $("#ganasTxt").textContent = `${estado.ganas}/10 ${CARAS[estado.ganas - 1]}`;
   $("#aviso").textContent = estado.aviso;
+  $("#historial").textContent = `🏃 Escapes exitosos: ${estado.historial.escapes} · 😶 Rechazados: ${estado.historial.rechazos}`;
 
   if (!rescate) return;
   $("#avatar").textContent = rescate.avatar;
@@ -199,12 +221,14 @@ $("#btnAtender").addEventListener("click", () => {
 
 $("#btnRechazar").addEventListener("click", () => {
   cortarTodo();
+  registrar("rechazo");
   estado.mensajeFin = "😶 Rechazaste tu propio rescate. Te quedás.";
   irA("fin");
 });
 
 $("#btnCortar").addEventListener("click", () => {
   cortarTodo();
+  registrar("escape");
   estado.mensajeFin = "🏃 ¡Escapaste con éxito! Nadie sospechó nada.";
   irA("fin");
 });

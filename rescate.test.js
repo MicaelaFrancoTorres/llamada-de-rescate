@@ -1,7 +1,7 @@
 // Tests de la función central. Se corren con: node --test
 const { test } = require("node:test");
 const assert = require("node:assert");
-const { armarRescate, nivelDeGanas, LUGARES } = require("./rescate.js");
+const { armarRescate, nivelDeGanas, LUGARES, registrarResultado } = require("./rescate.js");
 
 test("R1: las ganas definen el nivel (1-3 suave, 4-7 medio, 8-10 extremo)", () => {
   assert.strictEqual(nivelDeGanas(1), 0);
@@ -59,4 +59,25 @@ test("R5: la excusa es el primer turno de 'vos' y el diálogo cambia con el nive
   assert.strictEqual(extremo.decir, extremo.dialogo[1].texto);
   assert.match(extremo.decir, /arito/);
   assert.notDeepStrictEqual(armarRescate("cita", 2).dialogo, extremo.dialogo);
+});
+
+test("R7: registrarResultado suma un escape o un rechazo", () => {
+  const vacio = { escapes: 0, rechazos: 0 };
+  assert.deepStrictEqual(registrarResultado(vacio, "escape"), { escapes: 1, rechazos: 0 });
+  assert.deepStrictEqual(registrarResultado({ escapes: 2, rechazos: 3 }, "rechazo"), { escapes: 2, rechazos: 4 });
+});
+
+test("R7: registrarResultado devuelve un objeto nuevo y no muta el original", () => {
+  const original = Object.freeze({ escapes: 1, rechazos: 1 });
+  const nuevo = registrarResultado(original, "escape");
+  assert.notStrictEqual(nuevo, original);
+  assert.deepStrictEqual(original, { escapes: 1, rechazos: 1 });
+  assert.notStrictEqual(registrarResultado(original, "otra-cosa"), original);
+  assert.deepStrictEqual(registrarResultado(original, "otra-cosa"), original);
+});
+
+test("R7: un historial inválido cuenta como cero", () => {
+  assert.deepStrictEqual(registrarResultado(null, "escape"), { escapes: 1, rechazos: 0 });
+  assert.deepStrictEqual(registrarResultado(undefined, "rechazo"), { escapes: 0, rechazos: 1 });
+  assert.deepStrictEqual(registrarResultado({ escapes: "x", rechazos: -4 }, "escape"), { escapes: 1, rechazos: 0 });
 });

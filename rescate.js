@@ -164,5 +164,19 @@ function armarRescate(lugarId, ganas) {
   };
 }
 
+// Historial: cuenta escapes y rechazos. Los valores inválidos cuentan como 0
+const normalizarHistorial = (h) => {
+  const contador = (n) => (Number.isInteger(n) && n >= 0 ? n : 0);
+  return { escapes: contador(h?.escapes), rechazos: contador(h?.rechazos) };
+};
+
+// Función pura: devuelve un objeto NUEVO, nunca modifica el que recibe
+function registrarResultado(historial, resultado) {
+  const { escapes, rechazos } = normalizarHistorial(historial);
+  if (resultado === "escape") return { escapes: escapes + 1, rechazos };
+  if (resultado === "rechazo") return { escapes, rechazos: rechazos + 1 };
+  return { escapes, rechazos };
+}
+
 // Permite importar desde Node para los tests; en el navegador se ignora
-if (typeof module !== "undefined") module.exports = { armarRescate, nivelDeGanas, LUGARES };
+if (typeof module !== "undefined") module.exports = { armarRescate, nivelDeGanas, LUGARES, registrarResultado, normalizarHistorial };
