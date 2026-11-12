@@ -25,7 +25,7 @@ Lo distinto: la excusa se adapta al lugar y a tu desesperación. Cuantas más ga
 2. Elegir dónde estás, mover la barra de ganas y apretar el botón rojo **RESCATAME**.
 3. Debería sonar una llamada entrante. Con 📞 aparece el guion de escape y con 📵 terminás la huida.
 
-**Tests** (requiere Node 18 o superior): `npm test`
+**Tests** (requiere Node 18 o superior): `npm test`. En GitHub, el workflow `CI` los corre solos en cada push y pull request.
 
 ## Estructura
 | Archivo | Qué hace |

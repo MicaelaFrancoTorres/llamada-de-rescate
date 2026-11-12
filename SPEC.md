@@ -18,7 +18,7 @@
 | 6 · DOM y APIs del navegador (persistencia) | `localStorage` con `try/catch`: si el navegador lo bloquea, la app sigue funcionando |
 | 8 · Objetos | `LUGARES` es un array de 8 objetos con `dialogos` anidados por nivel, y se usa desestructuración |
 | 32 · SDD | Esta spec: reglas, estados y transiciones, Given/When/Then, trazabilidad |
-| 38 / 41 · Testing | `rescate.test.js` con estructura AAA, casos borde y `node --test` |
+| 38 / 41 · Testing | `rescate.test.js` con estructura AAA, casos borde y `node --test`; el CI de GitHub Actions corre los tests en cada push y pull request |
 
 ## 1. Ficha del invento
 | Campo | Descripción |
@@ -83,6 +83,7 @@
 - **E11 (R7):** *Given* el historial dice "Escapes exitosos: 0 · Rechazados: 0", *When* corto una llamada y después rechazo otra, *Then* al volver al inicio veo "🏃 Escapes exitosos: 1 · 😶 Rechazados: 1", y sigue así después de recargar la página.
 - **E12 (R8):** *Given* estoy en el inicio sin elegir lugar, *When* toco la tecla R, *Then* se marca "Cumpleaños" y suena la llamada de "Mamá" (o empieza la cuenta regresiva si elegí demora). *Given* estoy escribiendo en un campo de texto o ya hay una llamada, *When* toco R, *Then* no pasa nada.
 - **E13 (R9):** *Given* escribí "  Tía Rosa  " en el nombre y elegí "Cumpleaños", *When* toco RESCATAME, *Then* suena una llamada de "Tía Rosa" en vez de "Mamá". *Given* dejé el campo vacío, *Then* llama "Mamá".
+- **E14 (CI):** *Given* hago push o abro un pull request a `main`, *When* termina el workflow "CI", *Then* `npm test` corrió con Node 22 y la pestaña Actions muestra el resultado (verde si pasan todos los tests).
 
 ## 8. Casos borde
 - Ganas en los límites: 1, 3, 4, 7, 8 y 10 (cubiertos por los tests).
@@ -104,6 +105,7 @@
 ## 10. Plan
 - HTML semántico, CSS con variables y JavaScript sin frameworks: se abre con doble clic.
 - `rescate.js` tiene la lógica pura (testeable) y `app.js` la interfaz con el patrón **estado → render**.
+- CI: `.github/workflows/ci.yml` corre `npm test` con Node 22 en cada push y pull request a `main`, y cancela la corrida anterior de la misma rama (`concurrency`).
 
 ## 11. Tareas y trazabilidad
 | Tarea | Regla | Escenario | Evidencia |
@@ -119,6 +121,7 @@
 | T9: Historial persistido | R7 | E11 | `registrarResultado` y sus tests en `rescate.js`, `localStorage` en `app.js` |
 | T10: Atajo de teclado secreto | R8 | E12 | `app.js` (`rescatar()` y `keydown`) y prueba manual |
 | T11: Nombre de contacto personalizado | R9 | E13 | `limpiarNombre` y `armarRescate` con tests en `rescate.js`, input en `index.html` |
+| T12: Integración continua | R1–R9 | E14 | `.github/workflows/ci.yml` y la pestaña Actions de GitHub |
 
 ## 12. Preguntas abiertas
 Ninguna crítica.
