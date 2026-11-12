@@ -15,6 +15,15 @@ test("R1: las ganas definen el nivel (1-3 suave, 4-7 medio, 8-10 extremo)", () =
 test("R2: cada lugar tiene su propio llamador", () => {
   assert.strictEqual(armarRescate("cumple", 5).quien, "Mamá");
   assert.strictEqual(armarRescate("trabajo", 5).quien, "Soporte Técnico");
+  assert.strictEqual(armarRescate("clase", 5).quien, "Hermano/a");
+  assert.strictEqual(armarRescate("asado", 5).quien, "Abuela");
+  assert.strictEqual(armarRescate("consorcio", 5).quien, "Cerrajero");
+  assert.strictEqual(armarRescate("sala", 5).quien, "Trabajo");
+});
+
+test("R2: hay 8 lugares y todos tienen diálogo para los 3 niveles", () => {
+  assert.strictEqual(LUGARES.length, 8);
+  for (const lugar of LUGARES) assert.strictEqual(lugar.dialogos.length, 3, lugar.id);
 });
 
 test("R3: más ganas = menos credibilidad pero escape más rápido", () => {

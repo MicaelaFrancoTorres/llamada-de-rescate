@@ -12,7 +12,7 @@
 | 5 · JavaScript base (ampliación) | `setInterval` para la cuenta regresiva, `Number()` para leer la demora y `??=` para crear el audio una sola vez |
 | 6 · DOM y APIs del navegador | `speechSynthesis` para leer los turnos de la llamada; burbujas de chat dibujadas desde el estado |
 | 7 · Arrays | `find`, `map`, `includes`, `forEach`, `slice` (métodos que no modifican el array) |
-| 8 · Objetos | `LUGARES` es un array de objetos y se usa desestructuración |
+| 8 · Objetos | `LUGARES` es un array de 8 objetos con `dialogos` anidados por nivel, y se usa desestructuración |
 | 32 · SDD | Esta spec: reglas, estados y transiciones, Given/When/Then, trazabilidad |
 | 38 / 41 · Testing | `rescate.test.js` con estructura AAA, casos borde y `node --test` |
 
@@ -21,9 +21,9 @@
 |---|---|
 | Nombre | Llamada de Rescate |
 | Pabellón | Molestias Cotidianas |
-| Quién | Persona atrapada en un cumpleaños, una reunión familiar, una cita o una reunión de trabajo |
+| Quién | Persona atrapada en un cumpleaños, una reunión familiar, una cita, el trabajo, una clase, un asado, una reunión de consorcio o una sala de espera |
 | Problema | Me quiero ir y no sé cómo hacerlo sin quedar mal |
-| Entrada | Lugar (4 opciones) y ganas de irme (1 a 10) |
+| Entrada | Lugar (8 opciones) y ganas de irme (1 a 10) |
 | Proceso | `armarRescate(lugar, ganas)` elige llamador, excusa, pasos, credibilidad y tiempo |
 | Salida | Llamada entrante falsa con sonido y, al atender, un guion de escape |
 | Ingrediente | **Botón de emergencia**: el botón rojo "RESCATAME" |
@@ -44,7 +44,7 @@
 
 ## 5. Reglas de negocio
 - **R1:** las ganas 1–3 son nivel suave, 4–7 medio y 8–10 extremo.
-- **R2:** cada lugar tiene un llamador fijo: cumpleaños → Mamá, familia → Vecina Marta, cita → Mejor amiga, trabajo → Soporte Técnico.
+- **R2:** cada lugar tiene un llamador fijo: cumpleaños → Mamá, familia → Vecina Marta, cita → Mejor amiga, trabajo → Soporte Técnico, clase aburrida → Hermano/a, asado eterno → Abuela, reunión de consorcio → Cerrajero, sala de espera → Trabajo. Son 8 lugares y cada uno tiene excusa y diálogo para los 3 niveles.
 - **R3:** credibilidad = base del nivel (94 / 78 / 52) − ganas. Tiempo de escape: 120 / 45 / 12 segundos.
 - **R4:** sin lugar elegido, o con ganas fuera de 1–10, no hay rescate (`null`) y se muestra un aviso.
 - **R5:** cada lugar y nivel tiene un `dialogo` de 5 turnos `{quien, texto}`: empieza con "llama", alterna con "vos" y es coherente con la excusa (`decir` es el primer turno de "vos"). Al atender, los turnos se revelan como chat (burbujas: izquierda quien llama, derecha vos). Los de "llama" se leen con `speechSynthesis` (es-AR o es-ES; sin soporte, 2,5 s de espera). Los de "vos" se resaltan "💬 Decí: ..." con 3 s de pausa. Con "🔊 Modo práctica" también se leen los de "vos" (pitch 0.8). Al terminar aparecen los pasos de escape y el botón Cortar. Cortar o rechazar frena la voz.
@@ -73,11 +73,13 @@
 - **E7 (R5):** *Given* atiendo una llamada, *When* pasan los turnos, *Then* las burbujas de quien llama aparecen a la izquierda y se leen en voz alta, mis frases aparecen a la derecha como "💬 Decí: ...", y al terminar los 5 turnos aparecen los pasos de escape y el botón Cortar.
 - **E8 (R5):** *Given* activé "🔊 Modo práctica", *When* llega un turno mío, *Then* también se lee en voz alta (pitch 0.8) antes de la pausa de 3 s.
 - **E9 (R6):** *Given* elegí "Cumpleaños" y "5 s", *When* toco RESCATAME, *Then* veo "⏳ Sonando en 5 s..." bajando cada segundo, el botón queda deshabilitado y a los 5 s suena la llamada de "Mamá".
+- **E10 (R2, R5):** *Given* elijo "Asado eterno" con ganas 5, *When* toco RESCATAME y atiendo, *Then* llama "Abuela" y la conversación habla de la luz cortada. Lo mismo vale para "Clase aburrida" (Hermano/a), "Reunión de consorcio" (Cerrajero) y "Sala de espera" (Trabajo).
 
 ## 8. Casos borde
 - Ganas en los límites: 1, 3, 4, 7, 8 y 10 (cubiertos por los tests).
 - Lugar inexistente o `null` → `null`.
 - Doble clic en RESCATAME mientras suena: no aplica, porque el botón ya no está visible.
+- Los 8 lugares existen en los 3 niveles: un test recorre todos para que no falte ninguna combinación.
 - Doble clic en RESCATAME durante la espera: se ignora, porque el botón está deshabilitado.
 - Con demora el timbre suena fuera del clic: el audio se crea y se reanuda en el clic para que el navegador lo permita.
 - Navegador sin `speechSynthesis`: cada turno de "llama" espera 2,5 s en silencio y la conversación sigue igual.
@@ -102,6 +104,7 @@
 | T5: Interfaz y estados | Transiciones | E1–E6 | `app.js` y prueba manual en el navegador |
 | T6: Conversación por turnos y voz | R5 | E3, E5, E7, E8 | `dialogos` en `rescate.js`, tests R5 y `app.js` |
 | T7: Demora antes de la llamada | R6 | E9 | `index.html` (radios), `app.js` (estado `esperando`) y prueba manual |
+| T8: Ocho lugares | R2, R5 | E10 | `LUGARES` en `rescate.js`, `index.html` (8 radios) y test de 8 lugares × 3 niveles |
 
 ## 12. Preguntas abiertas
 Ninguna crítica.
