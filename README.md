@@ -1,10 +1,8 @@
-# 🚨 Llamada de Rescate
+# Llamada de Rescate
 
 [![CI](https://github.com/MicaelaFrancoTorres/llamada-de-rescate/actions/workflows/ci.yml/badge.svg)](https://github.com/MicaelaFrancoTorres/llamada-de-rescate/actions/workflows/ci.yml)
 
-> Un botón de emergencia para huir con dignidad de cualquier lugar donde no querés estar.
-
-**Pabellón:** Molestias Cotidianas · **Ingrediente improbable:** Botón de emergencia
+Proyecto de la cursada para la Hackathon 2026. Pabellón: Molestias Cotidianas. Ingrediente improbable: botón de emergencia.
 
 ## Índice
 - [El problema](#el-problema)
@@ -22,26 +20,23 @@
 - [Autora](#autora)
 
 ## El problema
-Todos quedamos alguna vez atrapados en un cumpleaños aburrido, una reunión familiar eterna, una cita que va mal, una clase que no termina más, un asado que dura seis horas, una reunión de consorcio o una sala de espera. Nos queremos ir, pero irse sin más queda mal, y inventar una excusa en el momento sale peor: nos ponemos nerviosos, nos contradecimos y nadie nos cree.
-
-Lo que falta no es solo una excusa. Falta que alguien más *parezca* sostenerla: una llamada que los demás vean y escuchen, con alguien que habla como habla de verdad quien llama en esa situación.
+Elegí este problema porque nos pasó a todos: estás en un cumpleaños, una reunión familiar, una cita que no va bien o una sala de espera, y te querés ir, pero levantarte sin más queda mal. Inventar una excusa en el momento sale peor, porque te ponés nervioso y nadie te cree. Lo que me pareció que faltaba era que alguien más sostenga la excusa: una llamada que los demás puedan ver y escuchar.
 
 ## La solución
-Elegís dónde estás y cuántas ganas tenés de irte, apretás **RESCATAME** y tu pantalla recibe una **llamada entrante falsa**, con timbre y avatar que vibra. Al atender, empieza una **conversación por turnos**, como un chat: quien llama habla (y se lo escucha con voz), y a vos te marca qué decir en cada momento. Cuando termina, te muestra los **pasos de escape** y el botón para cortar.
+La app es un botón de emergencia. Elegís dónde estás y cuántas ganas tenés de irte, apretás RESCATAME y la pantalla simula una llamada entrante, con timbre y un avatar que vibra. Si atendés, empieza una conversación de cinco turnos que se va mostrando como un chat y se lee en voz alta. Quien llama habla con la voz de su personaje, y tus respuestas suenan con una voz distinta. Al terminar aparecen los pasos para escaparte y el botón para cortar.
 
-Lo distinto: todo se adapta al lugar y a tu desesperación. Cuantas más ganas tenés de irte, más dramática es la excusa y más rápido salís, aunque sea menos creíble.
+Cuantas más ganas tenés de irte, más dramática es la excusa y más rápido salís, aunque sea menos creíble.
 
 ## Características
-- 📍 **Ocho lugares**, cada uno con su propio llamador, su excusa y su diálogo.
-- 🎚️ **Tres niveles de desesperación** (suave, medio y extremo) que cambian la excusa, los pasos, la credibilidad y el tiempo de escape.
-- 🗣️ **Conversación por turnos** con burbujas de chat: quien llama a la izquierda, vos a la derecha.
-- 🔊 **Voz** para toda la conversación (`speechSynthesis`): cada personaje con su tono y velocidad, y tus respuestas con una voz distinta.
-- ⏳ **Demora configurable**: la llamada suena ya, a los 5 s o a los 10 s, con cuenta regresiva.
-- 👤 **Nombre personalizado**: elegís quién te llama (hasta 20 caracteres).
-- 🏆 **Historial** de escapes y rechazos, guardado en el navegador.
-- ⌨️ **Atajo secreto**: la tecla **R** dispara el rescate.
-- ♿ **Accesible**: HTML semántico, uso completo con teclado, foco visible y botones de 44 px como mínimo.
-- 🧪 **Con tests y CI**: la lógica está probada y GitHub Actions corre los tests en cada push.
+- Ocho lugares, cada uno con su llamador, su excusa y su diálogo.
+- Tres niveles de desesperación: suave, medio y extremo.
+- Conversación por turnos con burbujas de chat: quien llama a la izquierda y vos a la derecha.
+- Voz propia para cada personaje, y otra voz para tus respuestas.
+- Demora configurable: la llamada suena ya, a los 5 segundos o a los 10, con cuenta regresiva.
+- Nombre personalizado para quien llama, de hasta 20 caracteres.
+- Historial de escapes y rechazos, guardado en el navegador.
+- Atajo de teclado secreto: la tecla R dispara el rescate.
+- Se puede usar todo con el teclado, con foco visible y botones de 44 píxeles como mínimo.
 
 ## Máquina de estados
 ```mermaid
@@ -55,114 +50,112 @@ stateDiagram-v2
     en_llamada --> fin: Cortar y huir
     fin --> inicio: Volver
 ```
-Cualquier otra transición es inválida y se ignora. El estado `en_llamada` aparece como `en-llamada` en el código.
+Cualquier otra transición es inválida y se ignora. En el código el estado `en_llamada` se llama `en-llamada`.
 
 ## Niveles y lugares
-**Niveles** (regla R1 y R3):
+Las ganas definen el nivel (reglas R1 y R3):
 
-| Ganas | Nivel | Credibilidad | Tiempo de escape | Estilo de la excusa |
+| Ganas | Nivel | Credibilidad | Tiempo de escape | Tipo de excusa |
 |---|---|---|---|---|
-| 1 a 3 | Suave | 94 − ganas | 120 s | Tranquila y creíble |
-| 4 a 7 | Medio | 78 − ganas | 45 s | Un imprevisto |
-| 8 a 10 | Extremo | 52 − ganas | 12 s | Una catástrofe |
+| 1 a 3 | Suave | 94 - ganas | 120 s | Tranquila y creíble |
+| 4 a 7 | Medio | 78 - ganas | 45 s | Un imprevisto |
+| 8 a 10 | Extremo | 52 - ganas | 12 s | Una emergencia |
 
-**Lugares y llamadores** (regla R2):
+Cada lugar tiene un llamador fijo y una voz propia (reglas R2 y R10). El tono y la velocidad son los valores de `speechSynthesis`:
 
-| Lugar | Llama |
-|---|---|
-| 🎂 Cumpleaños | Mamá |
-| 👵 Reunión familiar | Vecina Marta |
-| 💔 Cita | Mejor amiga |
-| 💼 Trabajo | Soporte Técnico |
-| 📚 Clase aburrida | Hermano/a |
-| 🍖 Asado eterno | Abuela |
-| 🏢 Reunión de consorcio | Cerrajero |
-| 🩺 Sala de espera | Trabajo |
+| Lugar | Llama | Tono | Velocidad |
+|---|---|---|---|
+| Cumpleaños | Mamá | 1,2 | 1 |
+| Reunión familiar | Vecina Marta | 1,3 | 0,9 |
+| Cita | Mejor amiga | 1,4 | 1,1 |
+| Trabajo | Soporte Técnico | 0,7 | 1 |
+| Clase aburrida | Hermano/a | 1,1 | 1,15 |
+| Asado eterno | Abuela | 1,3 | 0,8 |
+| Reunión de consorcio | Cerrajero | 0,6 | 0,95 |
+| Sala de espera | Trabajo | 0,8 | 1,05 |
 
 ## Cómo probarlo
-Descargá el repositorio y abrí `index.html` en el navegador (doble clic, no hace falta instalar nada). Para la voz conviene Chrome o Edge.
+Descargá el repositorio y abrí `index.html` en el navegador, con doble clic. No hay que instalar nada. Para escuchar las voces probalo en Chrome o Edge.
 
-| Escenario | Qué hacer | Qué debería pasar |
+| Escenario | Qué hacer | Qué tiene que pasar |
 |---|---|---|
-| E1 | Tocar RESCATAME sin elegir lugar | Aparece "⚠️ Primero elegí dónde estás" y no cambia de pantalla |
+| E1 | Tocar RESCATAME sin elegir lugar | Aparece el aviso "Primero elegí dónde estás" y no cambia de pantalla |
 | E2 | Elegir Cumpleaños y tocar RESCATAME | Suena una llamada de "Mamá" y el avatar vibra |
-| E3 | Elegir Cita, ganas 9, atender y esperar el final | Excusa extrema, "Credibilidad: 43%" y "Escape en 12 s" |
+| E3 | Elegir Cita con ganas 9, atender y esperar el final | Se ve la excusa extrema, "Credibilidad: 43%" y "Escape en 12 s" |
 | E4 | Rechazar mientras suena | Se corta el sonido y dice "Rechazaste tu propio rescate" |
-| E5 | Cortar al terminar la conversación | Se frena el contador y dice "¡Escapaste con éxito!" |
-| E6 | Volver desde el final | Volvés al inicio con tu lugar y tus ganas sin cambiar |
+| E5 | Cortar cuando termina la conversación | Se frena el contador y dice "¡Escapaste con éxito!" |
+| E6 | Tocar Volver desde el final | Volvés al inicio con el lugar y las ganas que habías elegido |
 | E7 | Atender una llamada | Las burbujas aparecen de a una, se leen en voz alta y al final salen los pasos y el botón Cortar |
-| E8 | Atender y esperar los 5 turnos | Se lee todo en orden, y tus frases suenan con otra voz |
-| E9 | Elegir "5 s" y tocar RESCATAME | Cuenta regresiva en pantalla y a los 5 s suena |
-| E10 | Elegir Asado eterno y atender | Llama "Abuela" |
-| E11 | Cortar una llamada y rechazar otra | El historial muestra 1 escape y 1 rechazo, y se mantiene al recargar |
-| E12 | Tocar la tecla **R** en el inicio | Se dispara el rescate (sin lugar, usa Cumpleaños) |
+| E8 | Atender y esperar los cinco turnos | Se lee todo en orden y tus frases suenan con otra voz |
+| E9 | Elegir 5 s y tocar RESCATAME | Hay una cuenta regresiva y a los 5 segundos suena |
+| E10 | Elegir Asado eterno y atender | Llama la Abuela |
+| E11 | Cortar una llamada y rechazar otra | El historial marca 1 escape y 1 rechazo, y se mantiene al recargar |
+| E12 | Tocar la tecla R en el inicio | Se dispara el rescate; si no elegiste lugar, usa Cumpleaños |
 | E13 | Escribir "Tía Rosa" en el nombre | Llama "Tía Rosa" en lugar del llamador del lugar |
 | E14 | Hacer push a `main` | El workflow CI corre los tests (pestaña Actions) |
+| E15 | Atender con Asado eterno y con Reunión de consorcio | La Abuela suena aguda y lenta, y el Cerrajero grave |
+| E16 | Leer un diálogo completo | Cada respuesta contesta lo que dijo quien llama |
+| E17 | Recorrer la app con Tab | Todos los controles tienen foco visible y los botones con ícono tienen nombre |
 
 ## Tests
-Requieren Node 18 o superior:
+Hace falta Node 18 o superior:
 
 ```
 npm test
 ```
-Cubren las reglas R1 a R9 de `rescate.js`: niveles y límites (1, 3, 4, 7, 8 y 10), llamadores de los 8 lugares, credibilidad y tiempo, entradas inválidas, diálogos de 5 turnos que alternan, historial sin mutación y nombre personalizado. En GitHub, el workflow `CI` los corre solos en cada push y pull request.
+Los tests cubren las reglas de lógica pura de `rescate.js`: los niveles y sus límites (1, 3, 4, 7, 8 y 10), los llamadores y las voces de los ocho lugares, la credibilidad y el tiempo, las entradas inválidas, los diálogos de cinco turnos que alternan, el español rioplatense de los textos, el historial sin mutación, el nombre personalizado y la elección de voces. En GitHub, el workflow `CI` los corre solo en cada push y pull request.
+
+La interfaz no tiene tests automáticos. La probé a mano en el navegador.
 
 ## Estructura
 | Archivo | Qué hace |
 |---|---|
 | `index.html` | Las dos pantallas, con HTML semántico y accesible |
 | `style.css` | Diseño con variables CSS, Grid y Flexbox, y animaciones |
-| `rescate.js` | Lógica pura: lugares, diálogos y funciones `armarRescate`, `registrarResultado` y `limpiarNombre` |
-| `app.js` | Interfaz: `estado`, `render()`, transiciones, voz, historial y atajo |
-| `rescate.test.js` | Tests de las reglas R1 a R9 |
-| `SPEC.md` | Especificación completa (reglas, estados, escenarios y trazabilidad) |
+| `rescate.js` | Lógica pura: lugares, diálogos, voces y las funciones `armarRescate`, `registrarResultado`, `limpiarNombre` y `elegirVoces` |
+| `app.js` | Interfaz: `estado`, `render()`, transiciones, voz, historial y atajo de teclado |
+| `rescate.test.js` | Tests de las reglas |
+| `SPEC.md` | Especificación: reglas, estados, escenarios y trazabilidad |
 | `.github/workflows/ci.yml` | Integración continua con GitHub Actions |
 | `package.json` | Script `npm test` |
 
 ## Decisiones técnicas
-- **Sin frameworks ni instalación**: HTML, CSS y JavaScript puro, se abre con doble clic.
-- **Lógica pura separada de la interfaz**: `rescate.js` no toca el DOM, por eso se testea con Node. `app.js` solo dibuja el estado.
-- **Patrón estado → render**: los datos viven en `estado` y `render()` dibuja la pantalla. Las transiciones válidas están en una tabla (`TRANSICIONES`).
-- **Diálogos que alternan por construcción**: `armarDialogo` asigna "llama" y "vos" según la posición, así ningún diálogo puede romper la alternancia.
-- **Voz con plan B**: si el navegador no tiene `speechSynthesis`, cada turno espera 2,5 s. Un identificador de sesión ignora los avisos tardíos de la voz cuando se corta o se rechaza.
-- **Audio habilitado en el clic**: el navegador solo deja sonar con un gesto del usuario, así que el audio se crea y reanuda en el clic aunque suene 10 s después.
-- **Inmutabilidad**: `registrarResultado` devuelve un objeto nuevo y no modifica el historial recibido.
-- **`localStorage` defensivo**: todo acceso va en `try/catch`. Si está bloqueado o tiene datos rotos, el historial arranca en 0 y la app funciona igual.
-- **Atajo R solo fuera de campos de texto**: así no se dispara mientras se escribe el nombre.
+- No usé frameworks. Con HTML, CSS y JavaScript solos, la app se abre con doble clic y no hay nada que instalar para mostrarla.
+- Decidí separar la lógica en `rescate.js` para poder testearla con Node, sin navegador. `app.js` solo se ocupa de la pantalla.
+- Usé el patrón estado y render: los datos viven en el objeto `estado` y `render()` dibuja la pantalla. Las transiciones válidas están en una tabla y cualquier otra se ignora.
+- Los diálogos se arman con `armarDialogo`, que asigna "llama" y "vos" según la posición. Así ningún diálogo puede romper la alternancia.
+- Para la voz, cada personaje tiene su tono y su velocidad. Si el navegador tiene más de una voz en español, mis respuestas usan otra; si tiene una sola, cambio el tono y la velocidad. Empiezo a hablar en el mismo clic de Atender, porque los navegadores no dejan hablar sin una acción de la persona. Si no hay `speechSynthesis`, cada turno espera unos segundos en silencio.
+- Por la misma razón creo el audio del timbre en el clic de RESCATAME, así suena aunque pase la demora.
+- `registrarResultado` devuelve un objeto nuevo y no modifica el historial que recibe.
+- Todo acceso a `localStorage` va dentro de un `try/catch`. Si está bloqueado o tiene datos rotos, el historial arranca en 0 y la app funciona igual.
+- La tecla R no hace nada si estás escribiendo en un campo de texto, para que no se dispare mientras escribís el nombre.
+- Para la accesibilidad usé listas, `figure` y `footer` en lugar de `div`. Agregué ARIA solo donde HTML no alcanza: `aria-live` en el chat, `role="timer"` en el reloj para que no se anuncie cada segundo y `aria-label` en los botones que solo tienen un emoji.
+- El chat agrega solo las burbujas nuevas, para que un lector de pantalla no relea toda la conversación en cada turno.
 
 ## Teoría de la cursada aplicada
-| Clase | Dónde se aplica |
+| Clase | Dónde la apliqué |
 |---|---|
-| 3 · HTML semántico y WCAG | `main`, `section`, `header`, `article`, `fieldset`/`legend`, `label`, `aria-label`, `aria-live`, `role="alert"`, foco visible, 44 px mínimos |
+| 3 · HTML semántico y WCAG | `main`, `section`, `header`, `article`, `footer`, `figure`, listas, `fieldset` y `legend`, `label`, `aria-live`, `aria-label`, `aria-hidden` en los emojis decorativos, foco visible y botones de 44 px |
 | 4 · CSS moderno | Variables CSS, Grid para las opciones, Flexbox para la llamada y el chat, `box-sizing`, media query y animaciones |
-| 5 · JavaScript base | `const`/`let`, `===`, arrow functions, template literals, `??` y `??=`, `trim` y `setInterval` |
-| 6 · DOM | `querySelector`, `addEventListener`, estado → render, eventos de teclado, `speechSynthesis` y `localStorage` |
-| 7 · Arrays | `find`, `map`, `includes`, `forEach`, `slice` |
-| 8 · Objetos | `LUGARES` como array de objetos con `dialogos` anidados, desestructuración y spread |
-| 32 · SDD | `SPEC.md`: reglas, estados y transiciones, Given/When/Then y trazabilidad |
-| 38 / 41 · Testing | `rescate.test.js` con estructura AAA, casos borde, `node --test` y CI |
+| 5 · JavaScript base | `const` y `let` (nunca `var`), nombres en español, `===`, arrow functions, template literals, `??` y `??=` |
+| 6 · DOM | `querySelector`, `addEventListener`, estado y render, eventos de teclado, `speechSynthesis` y `localStorage` |
+| 7 · Arrays | `find`, `map`, `filter`, `includes`, `forEach` y `slice` |
+| 8 · Objetos | `LUGARES` como array de objetos con diálogos anidados, desestructuración y spread |
+| 32 · SDD | `SPEC.md` con reglas, estados y transiciones, escenarios Given/When/Then y trazabilidad |
+| 38 y 41 · Testing | `rescate.test.js` con estructura AAA, casos borde, `node --test` y CI |
 
 ## Herramientas de IA utilizadas
-**Claude (Anthropic)** me ayudó a:
-- leer las bases, generar y comparar ideas;
-- redactar la spec siguiendo SDD;
-- escribir el código, los diálogos y los tests;
-- armar este README y el workflow de CI.
+Usé Claude (Anthropic). La IA escribió el código, los tests, la spec y este README.
 
-**Lo que decidí yo:**
-- la **idea** y el **pabellón** (Molestias Cotidianas);
-- el **ingrediente improbable**: el botón de emergencia;
-- qué mejoras sumar y en qué orden;
-- las **pruebas**: abrí la aplicación en el navegador y probé los escenarios;
-- la **revisión** del código y de lo que generó la IA, antes de entregarlo.
+Yo elegí la idea, el pabellón y el ingrediente, y decidí qué mejoras agregar y en qué orden. También probé todo a mano en el navegador y revisé el código antes de entregarlo.
 
 ## Mejoras futuras
 - Instalarla como app (PWA) para que funcione sin conexión desde el celular.
-- Vibración real del teléfono con `navigator.vibrate`.
-- Más lugares, y diálogos que usen el nombre personalizado.
-- Elegir la voz y la velocidad de lectura.
-- Tests automáticos de la interfaz.
-- Versión en otros idiomas.
+- Hacer vibrar el teléfono de verdad con `navigator.vibrate`.
+- Sumar más lugares y que los diálogos usen el nombre personalizado.
+- Poder elegir la voz y la velocidad de lectura.
+- Agregar tests automáticos de la interfaz.
+- Traducirla a otros idiomas.
 
 ## Autora
-**Micaela Franco Torres** · [github.com/MicaelaFrancoTorres](https://github.com/MicaelaFrancoTorres)
+Micaela Franco Torres - [github.com/MicaelaFrancoTorres](https://github.com/MicaelaFrancoTorres)

@@ -115,6 +115,7 @@
 ## 10. Plan
 - HTML semántico, CSS con variables y JavaScript sin frameworks: se abre con doble clic.
 - `rescate.js` tiene la lógica pura (testeable) y `app.js` la interfaz con el patrón **estado → render**.
+- Documentación: el README está escrito en primera persona, en español rioplatense, sin emojis (la app sí los usa) y sin texto repetido.
 - CI: `.github/workflows/ci.yml` corre `npm test` con Node 22 en cada push y pull request a `main`, y cancela la corrida anterior de la misma rama (`concurrency`).
 
 ## 11. Tareas y trazabilidad
@@ -134,6 +135,7 @@
 | T12: Integración continua | R1–R9 | E14 | `.github/workflows/ci.yml` y la pestaña Actions de GitHub |
 | T13: Voces por personaje y para las respuestas | R10, R11 | E7, E8, E15 | `voz` en `LUGARES` y `elegirVoces` con tests en `rescate.js`, `leer()` en `app.js` |
 | T14: Semántica, accesibilidad y excusas realistas | R12, R13 | E16, E17 | `index.html`, `style.css`, `dialogos` en `rescate.js` con tests R12, y `app.js` |
+| T15: README sin emojis y en primera persona | — | E1–E17 (tabla "Cómo probarlo") | `README.md` |
 
 ## 12. Preguntas abiertas
 Ninguna crítica.
