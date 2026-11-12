@@ -22,6 +22,7 @@ body {
 }
 main { max-width: 420px; margin: auto; padding: 24px 16px; }
 .sub { color: var(--suave); }
+.atajo { font-size: .75rem; color: var(--suave); }
 
 /* Foco visible para teclado (clase 3) */
 :focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }

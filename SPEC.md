@@ -13,6 +13,7 @@
 | 6 · DOM y APIs del navegador | `speechSynthesis` para leer los turnos de la llamada; burbujas de chat dibujadas desde el estado |
 | 7 · Arrays | `find`, `map`, `includes`, `forEach`, `slice` (métodos que no modifican el array) |
 | 7 · Arrays y 8 · Objetos (inmutabilidad) | `registrarResultado` devuelve un objeto nuevo con desestructuración, sin mutar el historial recibido |
+| 6 · DOM (eventos de teclado) | `keydown` en `document`, `e.key` y `matches` para ignorar los campos de texto |
 | 6 · DOM y APIs del navegador (persistencia) | `localStorage` con `try/catch`: si el navegador lo bloquea, la app sigue funcionando |
 | 8 · Objetos | `LUGARES` es un array de 8 objetos con `dialogos` anidados por nivel, y se usa desestructuración |
 | 32 · SDD | Esta spec: reglas, estados y transiciones, Given/When/Then, trazabilidad |
@@ -48,6 +49,7 @@
 - **R1:** las ganas 1–3 son nivel suave, 4–7 medio y 8–10 extremo.
 - **R2:** cada lugar tiene un llamador fijo: cumpleaños → Mamá, familia → Vecina Marta, cita → Mejor amiga, trabajo → Soporte Técnico, clase aburrida → Hermano/a, asado eterno → Abuela, reunión de consorcio → Cerrajero, sala de espera → Trabajo. Son 8 lugares y cada uno tiene excusa y diálogo para los 3 niveles.
 - **R7:** el historial es `{escapes, rechazos}`. `registrarResultado(historial, resultado)` es una función pura: con "escape" suma un escape, con "rechazo" suma un rechazo, y devuelve siempre un objeto **nuevo** sin mutar el recibido. Un historial inválido cuenta como 0. Cortar la llamada registra un escape; rechazarla, un rechazo. Se guarda en `localStorage` (con `try/catch`) y se muestra en el inicio: "🏃 Escapes exitosos: N · 😶 Rechazados: M".
+- **R8:** en el estado inicio, la tecla R (sin Ctrl, Alt ni Meta) dispara el rescate igual que el botón RESCATAME, con la misma demora. Si no hay lugar elegido usa "cumple" y lo marca en pantalla. No se activa mientras se escribe en un campo de texto, ni en otros estados. En el inicio se ve el texto chico "Atajo secreto: tecla R".
 - **R3:** credibilidad = base del nivel (94 / 78 / 52) − ganas. Tiempo de escape: 120 / 45 / 12 segundos.
 - **R4:** sin lugar elegido, o con ganas fuera de 1–10, no hay rescate (`null`) y se muestra un aviso.
 - **R5:** cada lugar y nivel tiene un `dialogo` de 5 turnos `{quien, texto}`: empieza con "llama", alterna con "vos" y es coherente con la excusa (`decir` es el primer turno de "vos"). Al atender, los turnos se revelan como chat (burbujas: izquierda quien llama, derecha vos). Los de "llama" se leen con `speechSynthesis` (es-AR o es-ES; sin soporte, 2,5 s de espera). Los de "vos" se resaltan "💬 Decí: ..." con 3 s de pausa. Con "🔊 Modo práctica" también se leen los de "vos" (pitch 0.8). Al terminar aparecen los pasos de escape y el botón Cortar. Cortar o rechazar frena la voz.
@@ -78,6 +80,7 @@
 - **E9 (R6):** *Given* elegí "Cumpleaños" y "5 s", *When* toco RESCATAME, *Then* veo "⏳ Sonando en 5 s..." bajando cada segundo, el botón queda deshabilitado y a los 5 s suena la llamada de "Mamá".
 - **E10 (R2, R5):** *Given* elijo "Asado eterno" con ganas 5, *When* toco RESCATAME y atiendo, *Then* llama "Abuela" y la conversación habla de la luz cortada. Lo mismo vale para "Clase aburrida" (Hermano/a), "Reunión de consorcio" (Cerrajero) y "Sala de espera" (Trabajo).
 - **E11 (R7):** *Given* el historial dice "Escapes exitosos: 0 · Rechazados: 0", *When* corto una llamada y después rechazo otra, *Then* al volver al inicio veo "🏃 Escapes exitosos: 1 · 😶 Rechazados: 1", y sigue así después de recargar la página.
+- **E12 (R8):** *Given* estoy en el inicio sin elegir lugar, *When* toco la tecla R, *Then* se marca "Cumpleaños" y suena la llamada de "Mamá" (o empieza la cuenta regresiva si elegí demora). *Given* estoy escribiendo en un campo de texto o ya hay una llamada, *When* toco R, *Then* no pasa nada.
 
 ## 8. Casos borde
 - Ganas en los límites: 1, 3, 4, 7, 8 y 10 (cubiertos por los tests).
@@ -111,6 +114,7 @@
 | T7: Demora antes de la llamada | R6 | E9 | `index.html` (radios), `app.js` (estado `esperando`) y prueba manual |
 | T8: Ocho lugares | R2, R5 | E10 | `LUGARES` en `rescate.js`, `index.html` (8 radios) y test de 8 lugares × 3 niveles |
 | T9: Historial persistido | R7 | E11 | `registrarResultado` y sus tests en `rescate.js`, `localStorage` en `app.js` |
+| T10: Atajo de teclado secreto | R8 | E12 | `app.js` (`rescatar()` y `keydown`) y prueba manual |
 
 ## 12. Preguntas abiertas
 Ninguna crítica.

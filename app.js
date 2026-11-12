@@ -180,7 +180,7 @@ $("#practica").addEventListener("change", (e) => {
   estado.practica = e.target.checked;
 });
 
-$("#btnRescate").addEventListener("click", () => {
+function rescatar() {
   const rescate = armarRescate(estado.lugar, estado.ganas);
   if (!rescate) {
     estado.aviso = "⚠️ Primero elegí dónde estás";
@@ -205,6 +205,20 @@ $("#btnRescate").addEventListener("click", () => {
     estado.aviso = "";
     empezarASonar();
   }, 1000);
+}
+
+$("#btnRescate").addEventListener("click", rescatar);
+
+// Atajo secreto: la tecla R dispara el rescate (sin lugar elegido usa "cumple")
+document.addEventListener("keydown", (e) => {
+  const escribiendo = e.target.matches("input[type=text], textarea, select");
+  if (e.key.toLowerCase() !== "r" || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  if (escribiendo || estado.pantalla !== "inicio") return;
+  if (!estado.lugar) {
+    estado.lugar = "cumple";
+    $("input[name=lugar][value=cumple]").checked = true;
+  }
+  rescatar();
 });
 
 $("#btnAtender").addEventListener("click", () => {
