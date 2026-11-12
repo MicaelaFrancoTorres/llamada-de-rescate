@@ -9,7 +9,8 @@
 | 4 · CSS moderno | `box-sizing: border-box`, variables CSS, Grid para la grilla de opciones, Flexbox para la pantalla de llamada, media query |
 | 5 · JavaScript base | `const`/`let` (sin `var`), `===`, arrow functions, template literals, `??` |
 | 6 · DOM | `querySelector`, `addEventListener`, patrón **estado → render()** |
-| 7 · Arrays | `find`, `map`, `includes`, `forEach` (métodos que no modifican el array) |
+| 6 · DOM y APIs del navegador | `speechSynthesis` para leer los turnos de la llamada; burbujas de chat dibujadas desde el estado |
+| 7 · Arrays | `find`, `map`, `includes`, `forEach`, `slice` (métodos que no modifican el array) |
 | 8 · Objetos | `LUGARES` es un array de objetos y se usa desestructuración |
 | 32 · SDD | Esta spec: reglas, estados y transiciones, Given/When/Then, trazabilidad |
 | 38 / 41 · Testing | `rescate.test.js` con estructura AAA, casos borde y `node --test` |
@@ -33,7 +34,7 @@
 ## 3. Alcance
 - Elegir el lugar y el nivel de ganas.
 - Simular una llamada entrante con sonido y vibración del avatar.
-- Mostrar el guion de escape al atender.
+- Al atender, mostrar una conversación por turnos (chat y voz) y, al terminar, el guion de escape.
 - Rechazar la llamada o cortar para terminar, y volver al inicio.
 
 ## 4. Fuera de alcance
@@ -45,6 +46,7 @@
 - **R2:** cada lugar tiene un llamador fijo: cumpleaños → Mamá, familia → Vecina Marta, cita → Mejor amiga, trabajo → Soporte Técnico.
 - **R3:** credibilidad = base del nivel (94 / 78 / 52) − ganas. Tiempo de escape: 120 / 45 / 12 segundos.
 - **R4:** sin lugar elegido, o con ganas fuera de 1–10, no hay rescate (`null`) y se muestra un aviso.
+- **R5:** cada lugar y nivel tiene un `dialogo` de 5 turnos `{quien, texto}`: empieza con "llama", alterna con "vos" y es coherente con la excusa (`decir` es el primer turno de "vos"). Al atender, los turnos se revelan como chat (burbujas: izquierda quien llama, derecha vos). Los de "llama" se leen con `speechSynthesis` (es-AR o es-ES; sin soporte, 2,5 s de espera). Los de "vos" se resaltan "💬 Decí: ..." con 3 s de pausa. Con "🔊 Modo práctica" también se leen los de "vos" (pitch 0.8). Al terminar aparecen los pasos de escape y el botón Cortar. Cortar o rechazar frena la voz.
 
 ## 6. Estados y transiciones
 | Desde | Hacia | Evento |
@@ -52,7 +54,7 @@
 | inicio | sonando | Clic en RESCATAME con lugar elegido |
 | sonando | en-llamada | Clic en 📞 Atender |
 | sonando | fin | Clic en 📵 Rechazar |
-| en-llamada | fin | Clic en 📵 Cortar y huir |
+| en-llamada | fin | Clic en 📵 Cortar y huir (solo visible cuando terminó la conversación) |
 | fin | inicio | Clic en ← Volver |
 
 **Cualquier otra transición es inválida y se ignora.**
@@ -60,19 +62,24 @@
 ## 7. Criterios de aceptación (Given / When / Then)
 - **E1 (R4):** *Given* no elegí lugar, *When* toco RESCATAME, *Then* aparece "⚠️ Primero elegí dónde estás" y **no** cambia de pantalla.
 - **E2 (R2):** *Given* elegí "Cumpleaños", *When* toco RESCATAME, *Then* suena una llamada de "Mamá" y el avatar vibra.
-- **E3 (R1, R3):** *Given* "Cita" con ganas 9, *When* atiendo, *Then* veo la excusa extrema, "Credibilidad: 43%" y "Escape en 12 s", y el contador de llamada avanza.
+- **E3 (R1, R3):** *Given* "Cita" con ganas 9, *When* atiendo y termina la conversación, *Then* veo la excusa extrema, "Credibilidad: 43%" y "Escape en 12 s", y el contador de llamada avanzó mientras tanto.
 - **E4:** *Given* está sonando, *When* toco Rechazar, *Then* se corta el sonido y veo "Rechazaste tu propio rescate".
-- **E5:** *Given* estoy en la llamada, *When* toco Cortar, *Then* se frena el contador y veo "¡Escapaste con éxito!".
+- **E5:** *Given* estoy en la llamada y terminó la conversación, *When* toco Cortar, *Then* se frena el contador, se corta la voz y veo "¡Escapaste con éxito!".
 - **E6:** *Given* estoy en el fin, *When* toco Volver, *Then* vuelvo al inicio con mi lugar y mis ganas **sin cambiar**.
+- **E7 (R5):** *Given* atiendo una llamada, *When* pasan los turnos, *Then* las burbujas de quien llama aparecen a la izquierda y se leen en voz alta, mis frases aparecen a la derecha como "💬 Decí: ...", y al terminar los 5 turnos aparecen los pasos de escape y el botón Cortar.
+- **E8 (R5):** *Given* activé "🔊 Modo práctica", *When* llega un turno mío, *Then* también se lee en voz alta (pitch 0.8) antes de la pausa de 3 s.
 
 ## 8. Casos borde
 - Ganas en los límites: 1, 3, 4, 7, 8 y 10 (cubiertos por los tests).
 - Lugar inexistente o `null` → `null`.
 - Doble clic en RESCATAME mientras suena: no aplica, porque el botón ya no está visible.
+- Navegador sin `speechSynthesis`: cada turno de "llama" espera 2,5 s en silencio y la conversación sigue igual.
+- Rechazar o cortar mientras habla la voz: se cancela la lectura y no se revela ningún turno más.
 
 ## 9. Accesibilidad
 - Etiquetas `label`, `fieldset` y `legend` en el formulario. Todo se puede usar con teclado (Tab, flechas y Enter).
 - Foco visible, botones de 44 px como mínimo y `aria-label` en los botones que solo tienen emoji.
+- El chat vive dentro de la región `aria-live="polite"`, así que un lector de pantalla anuncia cada turno nuevo. El modo práctica es opcional.
 
 ## 10. Plan
 - HTML semántico, CSS con variables y JavaScript sin frameworks: se abre con doble clic.
@@ -86,6 +93,7 @@
 | T3: Estilos | — | E2 (vibración) | `style.css` |
 | T4: Lógica y tests | R1–R4 | E2, E3 | `rescate.js` y `rescate.test.js` (`npm test` en verde) |
 | T5: Interfaz y estados | Transiciones | E1–E6 | `app.js` y prueba manual en el navegador |
+| T6: Conversación por turnos y voz | R5 | E3, E5, E7, E8 | `dialogos` en `rescate.js`, tests R5 y `app.js` |
 
 ## 12. Preguntas abiertas
 Ninguna crítica.

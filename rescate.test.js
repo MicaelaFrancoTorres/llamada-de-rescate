@@ -1,7 +1,7 @@
 // Tests de la función central. Se corren con: node --test
 const { test } = require("node:test");
 const assert = require("node:assert");
-const { armarRescate, nivelDeGanas } = require("./rescate.js");
+const { armarRescate, nivelDeGanas, LUGARES } = require("./rescate.js");
 
 test("R1: las ganas definen el nivel (1-3 suave, 4-7 medio, 8-10 extremo)", () => {
   assert.strictEqual(nivelDeGanas(1), 0);
@@ -30,4 +30,24 @@ test("R4: entradas inválidas devuelven null", () => {
   assert.strictEqual(armarRescate("playa", 5), null);
   assert.strictEqual(armarRescate("cita", 0), null);
   assert.strictEqual(armarRescate("cita", 11), null);
+});
+
+test("R5: cada lugar y nivel tiene un diálogo de 5 turnos que empieza con 'llama' y alterna", () => {
+  for (const { id } of LUGARES) {
+    for (const ganas of [2, 5, 9]) {
+      const { dialogo } = armarRescate(id, ganas);
+      assert.strictEqual(dialogo.length, 5);
+      dialogo.forEach(({ quien, texto }, i) => {
+        assert.strictEqual(quien, i % 2 === 0 ? "llama" : "vos");
+        assert.ok(typeof texto === "string" && texto.length > 0);
+      });
+    }
+  }
+});
+
+test("R5: la excusa es el primer turno de 'vos' y el diálogo cambia con el nivel", () => {
+  const extremo = armarRescate("cita", 9);
+  assert.strictEqual(extremo.decir, extremo.dialogo[1].texto);
+  assert.match(extremo.decir, /arito/);
+  assert.notDeepStrictEqual(armarRescate("cita", 2).dialogo, extremo.dialogo);
 });

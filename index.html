@@ -29,6 +29,8 @@
       <input type="range" id="ganas" min="1" max="10" value="5">
       <p id="ganasTxt"></p>
 
+      <label class="practica"><input type="checkbox" id="practica"> 🔊 Modo práctica (te leo también tus frases)</label>
+
       <button id="btnRescate" type="button">RESCATAME</button>
       <p id="aviso" role="alert"></p>
     </section>
@@ -41,9 +43,11 @@
 
       <article id="guion" hidden>
         <h3>📜 Tu guion de escape</h3>
-        <p id="decir"></p>
-        <ol id="pasos"></ol>
-        <p id="dato"></p>
+        <div id="chat"></div>
+        <div id="escape" hidden>
+          <ol id="pasos"></ol>
+          <p id="dato"></p>
+        </div>
       </article>
 
       <div id="fin" hidden>

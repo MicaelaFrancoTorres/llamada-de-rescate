@@ -11,6 +11,10 @@ Llamada de Rescate es un botón de emergencia para huir con dignidad. Elegís d�
 
 Lo distinto: la excusa se adapta al lugar y a tu desesperación. Cuantas más ganas tenés de irte, más dramática es la excusa y más rápido salís, aunque sea menos creíble.
 
+## Características
+- 🗣️ Conversación por turnos al atender: burbujas de chat, con la voz de quien llama (`speechSynthesis`).
+- 🔊 Modo práctica: también lee tus frases para ensayarlas.
+
 ## Cómo probarlo
 1. Descargar el repositorio y abrir `index.html` en el navegador (doble clic, no hace falta instalar nada).
 2. Elegir dónde estás, mover la barra de ganas y apretar el botón rojo **RESCATAME**.
@@ -25,7 +29,7 @@ Lo distinto: la excusa se adapta al lugar y a tu desesperación. Cuantas más ga
 | `style.css` | Diseño con variables CSS, Grid y Flexbox, y animaciones |
 | `rescate.js` | Lógica pura: datos y la función central `armarRescate(lugar, ganas)` |
 | `app.js` | Interfaz: `estado`, `render()` y transiciones entre pantallas |
-| `rescate.test.js` | Tests de las reglas R1 a R4 |
+| `rescate.test.js` | Tests de las reglas R1 a R5 |
 | `SPEC.md` | Especificación completa (reglas, estados y criterios de aceptación) |
 
 ## Herramientas de IA utilizadas

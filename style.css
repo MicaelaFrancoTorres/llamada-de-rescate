@@ -53,7 +53,7 @@ input[type=range] { width: 100%; min-height: 44px; accent-color: var(--rojo); }
 
 /* Pantalla de llamada: Flexbox en columna */
 #llamada {
-  position: fixed; inset: 0; padding: 50px 20px;
+  position: fixed; inset: 0; padding: 50px 20px; overflow-y: auto;
   background: linear-gradient(#2b3a55, #121826);
   display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
@@ -64,6 +64,13 @@ input[type=range] { width: 100%; min-height: 44px; accent-color: var(--rojo); }
 #guion { width: 100%; max-width: 420px; background: #0006; border-radius: 14px; padding: 14px; text-align: left; }
 #guion h3 { color: var(--acento); margin: 0; }
 #dato { color: #9fe3b0; }
+
+/* Chat: quien llama a la izquierda, vos a la derecha */
+#chat { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.burbuja { margin: 0; padding: 8px 12px; border-radius: 14px; max-width: 85%; }
+.burbuja.llama { align-self: flex-start; background: #33415c; border-bottom-left-radius: 4px; }
+.burbuja.vos { align-self: flex-end; background: #1f6f3a; border: 2px solid var(--acento); border-bottom-right-radius: 4px; font-weight: bold; }
+.practica { display: flex; justify-content: center; align-items: center; gap: 8px; min-height: 44px; margin-top: 8px; cursor: pointer; }
 
 .botones { display: flex; gap: 80px; margin-top: auto; }
 #btnCortar { margin-top: auto; }
