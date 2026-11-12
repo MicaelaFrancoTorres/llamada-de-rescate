@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/MicaelaFrancoTorres/llamada-de-rescate/actions/workflows/ci.yml/badge.svg)](https://github.com/MicaelaFrancoTorres/llamada-de-rescate/actions/workflows/ci.yml)
 
-Proyecto de la cursada para la Hackathon 2026. Pabellón: Molestias Cotidianas. Ingrediente improbable: botón de emergencia.
+**Pabellón:** Molestias Cotidianas
+
+**Ingrediente improbable:** Botón de emergencia
 
 ## Índice
 - [El problema](#el-problema)
@@ -75,7 +77,11 @@ Cada lugar tiene un llamador fijo y una voz propia (reglas R2 y R10). El tono y 
 | Sala de espera | Trabajo | 0,8 | 1,05 |
 
 ## Cómo probarlo
-Descargá el repositorio y abrí `index.html` en el navegador, con doble clic. No hay que instalar nada. Para escuchar las voces probalo en Chrome o Edge.
+1. Abrí la demo en https://micaelafrancotorres.github.io/llamada-de-rescate/ o descargá el repositorio y abrí index.html con doble clic.
+2. Elegí dónde estás, mové la barra de ganas de irte y apretá el botón rojo RESCATAME.
+3. Al final debería sonar una llamada entrante: al atender se escucha a quien llama, aparece la conversación con lo que tenés que responder y, cuando termina, el guion de escape y el botón para cortar.
+
+No hay que instalar nada. Para escuchar las voces probalo en Chrome o Edge. Estos son los escenarios que fui probando:
 
 | Escenario | Qué hacer | Qué tiene que pasar |
 |---|---|---|
